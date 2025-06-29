@@ -40,6 +40,7 @@
             margin-left: auto;
             margin-right: auto;
             padding: 1rem; /* Consistent padding for all sections */
+            
         }
 
         /* Section heading styling, including initial state for animation */
@@ -653,11 +654,11 @@
         <section id="projects" class="py-16">
             <h2 class="section-heading">Featured Projects</h2>
             <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-                <!-- Calypso Project Description -->
+                <!-- Kalypso Project Description -->
                 <div class="card p-8">
-                    <h3 class="text-3xl font-bold text-white mb-4">Calypso: Autonomous AI Streamer</h3>
+                    <h3 class="text-3xl font-bold text-white mb-4">Kalypso: Autonomous AI Streamer</h3>
                     <p class="text-gray-300 text-lg leading-relaxed mb-6">
-                        Calypso represents my flagship personal project - an innovative, fully autonomous AI streamer powered by cutting-edge large language models. This sophisticated system integrates three state-of-the-art AI models to generate expressive speech, thoughts, and movements, creating a seamless and perfect reflection of life.
+                        Kalypso represents my flagship personal project - an innovative, fully autonomous AI streamer powered by cutting-edge large language models. This sophisticated system integrates three state-of-the-art AI models to generate expressive speech, thoughts, and movements, creating a seamless and perfect reflection of life.
                     </p>
                     <ul class="list-disc list-inside text-gray-400 mb-6 space-y-2">
                         <li>Fully autonomous streaming capabilities</li>
@@ -666,19 +667,19 @@
                         <li>Real-time interaction and emotional responses</li>
                         <li>Advanced voice synthesis with personality traits</li>
                     </ul>
-                    <a href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer" class="btn-primary flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Join the Calypso Discord Server">
+                    <a href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer" class="btn-primary flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Join the Kalypso Discord Server">
                         Join the Discord Server
                         <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                     </a>
                 </div>
 
-                <!-- Calypso Audio Samples -->
+                <!-- Kalypso Audio Samples -->
                 <!-- This section's structure is now driven by the new jQuery script -->
                 <div id="player-container">
                     <!-- Header Section -->
                     <div class="text-center mb-4 px-4">
-                        <h1 class="text-3xl font-bold text-gray-100">Calypso: Whisper Audio Samples</h1>
-                        <p class="text-gray-400 mt-2 text-base">Experience the expressive voice features from Calypso with these audio demonstrations.</p>
+                        <h1 class="text-3xl font-bold text-gray-100">Kalypso: Whisper Audio Samples</h1>
+                        <p class="text-gray-400 mt-2 text-base">Experience the expressive voice features from Kalypso with these audio demonstrations.</p>
                     </div>
 
                     <!-- Audio Players Wrapper - blocks will be dynamically inserted here by JavaScript -->
@@ -844,16 +845,16 @@
             // Data for each audio sample
             const audioSamplesData = [
                 {
-                    title: "Sample 1: Expressive Dialogue",
-                    source: "https://framerusercontent.com/assets/X5CtL50ul7XPJdcejxqzC3B4yA.wav"
+                    title: "Step 1- Tuning the voice",
+                    source: "/home/eleven/ElevenLLM.dev_v2/ElevenLLM.dev_V2/audio/kaly_step1.wav"
                 },
                 {
-                    title: "Sample 2: Poetic Narration",
-                    source: "https://framerusercontent.com/assets/vXEtk2NADijQoiYRfbfGYyqxuk.mp3"
-                },
-                {
-                    title: "Sample 3: Fast-Paced Speech",
+                    title: "Step 2 - Teaching the model what a whisper is",
                     source: "https://framerusercontent.com/assets/7jDFf73yOCUiEjEsI0cdaml7Jw4.mp3"
+                },
+                {
+                    title: "Step 3-  Fine tuned model with a [whisper] token",
+                    source: "/home/eleven/ElevenLLM.dev_v2/ElevenLLM.dev_V2/audio/kaly_step3.wav"
                 }
             ];
 

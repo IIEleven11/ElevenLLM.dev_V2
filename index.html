@@ -690,6 +690,32 @@
             </div>
         </section>
 
+        <!-- Additional Voice Model Samples Section -->
+        <section id="voice-samples" class="py-16">
+            <h2 class="section-heading">Additional Voice Model Samples</h2>
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-8">
+                    <p class="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto">
+                        Explore my diverse portfolio of custom voice models. Each sample demonstrates different vocal characteristics, languages, and styles that showcase the versatility and quality of my AI voice engineering work.
+                    </p>
+                </div>
+
+                <!-- Additional Audio Samples Container -->
+                <div id="additional-player-container" class="max-w-4xl mx-auto">
+                    <!-- Header Section -->
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-bold text-gray-100 mb-2">Voice Model Portfolio</h3>
+                        <p class="text-gray-400 text-base">Professional voice synthesis demonstrations across different styles and languages.</p>
+                    </div>
+
+                    <!-- Additional Audio Players Wrapper - blocks will be dynamically inserted here by JavaScript -->
+                    <div id="additional-audio-players-wrapper" class="flex flex-col gap-6 px-4">
+                        <!-- Additional audio player blocks will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Let's Work Together / Contact Section -->
         <section id="contact" class="py-16 text-center">
             <h2 class="section-heading">Let's Work Together</h2>
@@ -818,7 +844,7 @@
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 // Using jQuery to iterate over audio elements created dynamically
-                $('#audio-players-wrapper audio').each(function() {
+                $('#audio-players-wrapper audio, #additional-audio-players-wrapper audio').each(function() {
                     if (!this.paused) {
                         this.pause();
                     }
@@ -1085,6 +1111,254 @@
             // Create an audio player for each sample in the data array
             audioSamplesData.forEach((sample, index) => {
                 createAudioPlayer(sample, index);
+            });
+
+            // Data for additional voice model samples
+            const additionalAudioSamplesData = [
+                {
+                    title: "Dutch Voice Model Sample",
+                    source: "./audio/other_samples/dutch_sample_1.wav",
+                    description: "Demonstration of Dutch language voice synthesis"
+                },
+                {
+                    title: "Female Voice Model - Sample 1",
+                    source: "./audio/other_samples/female_sample_1.wav",
+                    description: "Professional female voice model demonstration"
+                },
+                {
+                    title: "Female Voice Model - Sample 2",
+                    source: "./audio/other_samples/female_sample_2.wav",
+                    description: "Alternative female voice model with different characteristics"
+                },
+                {
+                    title: "Male Voice Model Sample",
+                    source: "./audio/other_samples/male_sample_1.wav",
+                    description: "Professional male voice model demonstration"
+                }
+            ];
+
+            const additionalAudioPlayersWrapper = $("#additional-audio-players-wrapper");
+            let additionalActiveAudio = null; // Stores the currently playing additional audio object
+
+            /**
+             * Creates and initializes an individual additional audio player block.
+             * @param {object} sample - The audio sample data.
+             * @param {number} index - The index of the sample.
+             */
+            function createAdditionalAudioPlayer(sample, index) {
+                // Construct the HTML for a single additional audio player block
+                const playerBlock = $(`
+                    <div class="audio-player-block" data-additional-index="${index}">
+                        <h2 class="text-xl font-semibold mb-2 sample-title">${sample.title}</h2>
+                        <p class="text-gray-400 text-sm mb-3">${sample.description}</p>
+                        <div class="flex items-center gap-4 mb-4">
+                            <button class="play-pause-btn additional-play-pause" aria-label="Play or Pause audio">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <div class="flex-grow">
+                                <div class="time-display mb-1" aria-live="polite">
+                                    <span class="current-time">0:00</span> / <span class="total-time">0:00</span>
+                                </div>
+                                <div class="seek-bar-container relative" role="slider" aria-label="Audio seek bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="seek-bar absolute" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <!-- Wave Animation -->
+                            <div class="wave-animation" role="img" aria-label="Audio playing visualizer">
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                            </div>
+                            <!-- Mute/Unmute Toggle Button -->
+                            <button class="mute-toggle-btn additional-mute-toggle" aria-label="Toggle mute">
+                                <i class="fas fa-volume-up"></i> <!-- Default to unmuted icon -->
+                            </button>
+                        </div>
+                        <a href="${sample.source}" download="${sample.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.wav" class="download-btn w-full block text-center py-2 px-4 rounded-lg text-base font-medium" aria-label="Download ${sample.title} audio sample">
+                            <i class="fas fa-download mr-2"></i> Download Sample
+                        </a>
+                        <div class="buffer-box" aria-live="assertive" role="status">Buffering ...</div>
+                    </div>
+                `);
+
+                // Get references to elements within this specific player block
+                const audio = new Audio(sample.source);
+                // Set preload to 'none' for lazy loading, will be set to 'metadata' on first interaction
+                audio.preload = 'none';
+
+                const playPauseBtn = playerBlock.find('.additional-play-pause');
+                const playPauseIcon = playPauseBtn.find('i');
+                const currentTimeSpan = playerBlock.find('.current-time');
+                const totalTimeSpan = playerBlock.find('.total-time');
+                const seekBarContainer = playerBlock.find('.seek-bar-container');
+                const seekBar = playerBlock.find('.seek-bar');
+                const muteToggleBtn = playerBlock.find('.additional-mute-toggle');
+                const muteToggleIcon = muteToggleBtn.find('i');
+                const waveAnimation = playerBlock.find('.wave-animation');
+                const bufferBox = playerBlock.find('.buffer-box');
+
+                // Set initial volume to unmuted
+                audio.muted = false;
+
+                // Event Listener for first interaction to preload metadata
+                playerBlock.one('mouseenter touchstart', () => {
+                    if (audio.preload === 'none') {
+                        audio.preload = 'metadata';
+                        console.log(`Additional Audio ${index + 1} metadata preloaded.`);
+                        // Attempt to load metadata (may not trigger loadedmetadata immediately)
+                        audio.load();
+                    }
+                });
+
+                playPauseBtn.on('click', function() {
+                    // Ensure metadata is loaded before attempting to play
+                    if (audio.readyState === 0) { // HAVE_NOTHING
+                        audio.preload = 'metadata';
+                        audio.load();
+                        console.log(`Loading metadata for additional audio ${index + 1} before play.`);
+                        bufferBox.show(); // Show buffer while loading
+                    }
+
+                    // Pause any currently active additional audio and stop its animation
+                    if (additionalActiveAudio && additionalActiveAudio !== audio) {
+                        additionalActiveAudio.pause();
+                        $(`[data-additional-index="${additionalActiveAudio.dataset.additionalIndex}"]`).find('.additional-play-pause i').removeClass('fa-pause').addClass('fa-play');
+                        $(`[data-additional-index="${additionalActiveAudio.dataset.additionalIndex}"]`).find('.wave-animation').removeClass('playing');
+                        additionalActiveAudio = null; // Clear active audio
+                    }
+
+                    // Also pause any Kalypso audio that might be playing
+                    if (activeAudio) {
+                        activeAudio.pause();
+                        $(`[data-index="${activeAudio.dataset.index}"]`).find('.play-pause-btn i').removeClass('fa-pause').addClass('fa-play');
+                        $(`[data-index="${activeAudio.dataset.index}"]`).find('.wave-animation').removeClass('playing');
+                        activeAudio = null;
+                    }
+
+                    if (audio.paused) {
+                        audio.play().catch(e => {
+                            console.error("Error playing additional audio:", e);
+                            showMessageBox('Could not play audio. Please check your connection or try again.');
+                            playPauseIcon.removeClass('fa-pause').addClass('fa-play');
+                            waveAnimation.removeClass('playing');
+                            bufferBox.hide();
+                        });
+                        playPauseIcon.removeClass('fa-play').addClass('fa-pause');
+                        waveAnimation.addClass('playing');
+                        additionalActiveAudio = audio; // Set this audio as active
+                        additionalActiveAudio.dataset.additionalIndex = index; // Store index for easier access
+                        playPauseBtn.attr('aria-label', 'Pause audio');
+                    } else {
+                        audio.pause();
+                        playPauseIcon.removeClass('fa-pause').addClass('fa-play');
+                        waveAnimation.removeClass('playing');
+                        additionalActiveAudio = null;
+                        playPauseBtn.attr('aria-label', 'Play audio');
+                    }
+                });
+
+                muteToggleBtn.on('click', function() {
+                    audio.muted = !audio.muted;
+                    if (audio.muted) {
+                        muteToggleIcon.removeClass('fa-volume-up').addClass('fa-volume-mute');
+                        muteToggleBtn.attr('aria-label', 'Unmute audio');
+                    } else {
+                        muteToggleIcon.removeClass('fa-volume-mute').addClass('fa-volume-up');
+                        muteToggleBtn.attr('aria-label', 'Mute audio');
+                    }
+                });
+
+                audio.addEventListener('loadedmetadata', () => {
+                    totalTimeSpan.text(formatTime(audio.duration));
+                    seekBarContainer.attr('aria-valuemax', Math.round(audio.duration));
+                    bufferBox.hide();
+                });
+
+                audio.addEventListener('timeupdate', () => {
+                    const progress = (audio.currentTime / audio.duration) * 100;
+                    seekBar.css('width', `${progress}%`);
+                    currentTimeSpan.text(formatTime(audio.currentTime));
+                    seekBarContainer.attr('aria-valuenow', Math.round(audio.currentTime));
+                });
+
+                audio.addEventListener('ended', () => {
+                    playPauseIcon.removeClass('fa-pause').addClass('fa-play');
+                    playPauseBtn.attr('aria-label', 'Play audio');
+                    seekBar.css('width', '0%');
+                    currentTimeSpan.text('0:00');
+                    audio.currentTime = 0; // Reset for replay
+                    waveAnimation.removeClass('playing'); // Stop animation
+                    additionalActiveAudio = null; // No audio is active
+                });
+
+                audio.addEventListener('waiting', () => {
+                    bufferBox.show();
+                    waveAnimation.removeClass('playing'); // Pause animation if buffering
+                });
+
+                audio.addEventListener('canplay', () => {
+                    bufferBox.hide();
+                    // If audio was previously playing and now can play, restart wave animation
+                    if (audio === additionalActiveAudio && !audio.paused) {
+                         waveAnimation.addClass('playing');
+                    }
+                });
+
+                audio.addEventListener('error', (e) => {
+                    console.error(`Additional audio error for sample ${index + 1}:`, e);
+                    showMessageBox('Error loading or playing this audio sample. Please check the file or try again later.');
+                    bufferBox.hide();
+                    playPauseIcon.removeClass('fa-pause').addClass('fa-play');
+                    waveAnimation.removeClass('playing'); // Stop animation on error
+                    additionalActiveAudio = null;
+                });
+
+                seekBarContainer.on('click', function (e) {
+                    const clickX = e.pageX - $(this).offset().left;
+                    const percent = (clickX / $(this).width());
+                    if (!isNaN(audio.duration) && audio.duration > 0) {
+                        audio.currentTime = percent * audio.duration;
+                    }
+                });
+
+                // Handle download button click with animation
+                playerBlock.find('.download-btn').on('click', function(e) {
+                    // Prevent default download behaviour to manage animation, then trigger programmatically
+                    e.preventDefault();
+                    const originalHTML = $(this).html();
+                    const downloadUrl = $(this).attr('href');
+                    const fileName = $(this).attr('download');
+
+                    $(this).html('<div class="audio-loading"></div> Downloading...');
+                    $(this).css('pointer-events', 'none');
+
+                    // Simulate the download; in a real scenario, you'd trigger a fetch or direct link
+                    // This creates a temporary invisible link and clicks it
+                    const tempLink = document.createElement('a');
+                    tempLink.href = downloadUrl;
+                    tempLink.download = fileName;
+                    document.body.appendChild(tempLink);
+                    tempLink.click();
+                    document.body.removeChild(tempLink);
+
+                    setTimeout(() => {
+                        $(this).html(originalHTML);
+                        $(this).css('pointer-events', 'auto');
+                        $(this).css('background', 'linear-gradient(135deg, #00ff88, #00cc66)'); // Greenish tint
+                        setTimeout(() => {
+                            $(this).css('background', 'linear-gradient(135deg, #bc80ff, #9933ff)'); // Revert to original purple gradient
+                        }, 1000);
+                    }, 2000); // Simulate 2-second download time + animation
+                });
+
+                additionalAudioPlayersWrapper.append(playerBlock);
+            }
+
+            // Initialize all additional audio players
+            additionalAudioSamplesData.forEach((sample, index) => {
+                createAdditionalAudioPlayer(sample, index);
             });
         });
     </script>

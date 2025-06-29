@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jake Mottola - AI/ML Engineer Portfolio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- jQuery CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        /* Base styles for the body, setting font, background, and text color */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Prevent default touch highlight */
+            user-select: none; /* Disable text selection */
+            min-height: 100vh;
+            margin: 0;
+            padding: 0; /* Remove body padding, it will be handled by main-content-wrapper */
+            box-sizing: border-box;
+            background-color: #000000; /* Pure black, matches general theme */
+            color: #e5e5e5; /* Light gray for text */
+            transition: background-color 0.5s ease-in-out; /* Smooth transition for background changes */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-y: auto; /* Enable scrolling for multiple blocks */
+        }
+
+        /* Ensure focus outline is removed for aesthetic, but consider accessibility alternatives if this app were more complex */
+        *:focus {
+            outline: none;
+        }
+
+        /* Main content wrapper to center and provide consistent padding */
+        .main-content-wrapper {
+            max-width: 1200px; /* Max width for content */
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1rem; /* Consistent padding for all sections */
+        }
+
+        /* Section heading styling, including initial state for animation */
+        .section-heading {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #bc80ff; /* Bright purple for headings */
+            text-align: center;
+            margin-bottom: 2rem;
+            opacity: 0; /* Hidden initially for animation */
+            transform: translateY(20px); /* Slightly moved down initially */
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out; /* Animation properties */
+        }
+
+        /* Animation class for section headings */
+        .section-heading.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Card styling, with gradient background, border, shadow, and animation properties */
+        .card {
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d); /* Dark gradient */
+            border: 1px solid #2a2a2a;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+            position: relative;
+            opacity: 0; /* Hidden initially for animation */
+            transform: scale(0.95); /* Slightly scaled down initially */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out; /* Animation properties */
+        }
+
+        /* Card hover effects, including lift and shadow change */
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(188, 128, 255, 0.2); /* Purple shadow */
+            border-color: #bc80ff; /* Bright purple border */
+        }
+
+        /* Animation class for cards */
+        .card.animate-in {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Primary button styling, with gradient background, rounded corners, and shadow */
+        .btn-primary {
+            background: linear-gradient(135deg, #bc80ff, #9933ff); /* Purple gradient */
+            color: #000000;
+            padding: 0.8rem 1.8rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(188, 128, 255, 0.3); /* Purple shadow */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden; /* For the shine effect */
+        }
+
+        /* Shine effect for primary buttons */
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        /* Shine effect on hover */
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        /* Primary button hover effects */
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9933ff, #7b30e0); /* Darker purple gradient */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(188, 128, 255, 0.4); /* Purple shadow */
+        }
+
+        /* Hero section specific animations */
+        .hero-title {
+            animation: fadeInDown 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        .hero-subtitle {
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        .hero-button {
+            animation: zoomIn 1s ease-out 0.6s forwards;
+            opacity: 0;
+        }
+
+        /* Keyframe animations for hero section elements */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Enhanced Voice Visualizer Animation (from original site, kept for other sections) */
+        .visualizer-container {
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            height: 60px;
+            padding: 10px;
+        }
+
+        .visualizer-bar {
+            width: 6px;
+            height: 4px;
+            background: linear-gradient(to top, #bc80ff, #9933ff); /* Purple gradient */
+            margin: 0 2px;
+            border-radius: 3px;
+            animation: visualize 1.5s ease-in-out infinite alternate;
+            box-shadow: 0 0 10px rgba(188, 128, 255, 0.3); /* Purple shadow */
+        }
+
+        /* Animation delays for individual visualizer bars to create a wave effect */
+        .visualizer-bar:nth-child(1) { animation-delay: 0s; }
+        .visualizer-bar:nth-child(2) { animation-delay: 0.1s; }
+        .visualizer-bar:nth-child(3) { animation-delay: 0.2s; }
+        .visualizer-bar:nth-child(4) { animation-delay: 0.3s; }
+        .visualizer-bar:nth-child(5) { animation-delay: 0.4s; }
+        .visualizer-bar:nth-child(6) { animation-delay: 0.5s; }
+        .visualizer-bar:nth-child(7) { animation-delay: 0.6s; }
+        .visualizer-bar:nth-child(8) { animation-delay: 0.7s; }
+        .visualizer-bar:nth-child(9) { animation-delay: 0.8s; }
+        .visualizer-bar:nth-child(10) { animation-delay: 0.9s; }
+
+        /* Keyframe animation for voice visualizer bars */
+        @keyframes visualize {
+            0% { height: 4px; transform: translateY(0); }
+            50% { height: 40px; transform: translateY(-20px); }
+            100% { height: 4px; transform: translateY(0); }
+        }
+
+        /* Message Box Overlay Styling */
+        .message-box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0; /* Hidden initially */
+            visibility: hidden; /* Hidden initially */
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(5px); /* Blurred background effect */
+        }
+
+        /* Show class for message box overlay */
+        .message-box-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Message Box Content Styling */
+        .message-box-content {
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border: 1px solid #2a2a2a;
+            color: #e5e5e5;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.9);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            transform: scale(0.9); /* Slightly scaled down initially */
+            transition: transform 0.3s ease;
+        }
+
+        /* Scale up animation for message box content when shown */
+        .message-box-overlay.show .message-box-content {
+            transform: scale(1);
+        }
+
+        /* Button inside message box */
+        .message-box-content button {
+            background: linear-gradient(135deg, #bc80ff, #9933ff); /* Purple gradient */
+            color: #000000;
+            padding: 0.6rem 1.2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* Message box button hover effect */
+        .message-box-content button:hover {
+            background: linear-gradient(135deg, #9933ff, #7b30e0); /* Darker purple gradient */
+            transform: translateY(-2px);
+        }
+
+        /* Container for the new audio player blocks */
+        #player-container {
+            width: 100%;
+            max-width: 400px; /* Fixed max width for the audio players section */
+            background-color: #0f172a; /* Dark background as in the reference image */
+            border-radius: 1.5rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* Space between player blocks */
+            padding: 1.5rem 0; /* Vertical padding */
+            margin-left: auto; /* Center the container for larger screens */
+            margin-right: auto;
+        }
+
+        /* Styling for each individual audio player block */
+        .audio-player-block {
+            background-color: #1a202c; /* Darker background for each player block */
+            border-radius: 0.75rem; /* Rounded corners */
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); /* Darker shadow */
+            border: 1px solid #2d3748; /* Subtle border */
+        }
+
+        .audio-player-block h2.sample-title { /* Target the sample title specifically */
+            color: #cbd5e0; /* Lighter text for sample titles */
+        }
+
+        /* Play/Pause Button */
+        .play-pause-btn {
+            flex-shrink: 0; /* Prevent shrinking */
+            width: 3rem; /* Adjusted width */
+            height: 3rem; /* Adjusted height */
+            background-color: #8b5cf6; /* Purple color */
+            border-radius: 50%;
+            color: #ffffff; /* White icon */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .play-pause-btn:hover {
+            background-color: #7c3aed; /* Darker purple on hover */
+        }
+
+        /* Time Display */
+        .time-display {
+            color: #a0aec0; /* Light gray for time */
+            font-size: 0.875rem; /* Small font size */
+        }
+
+        /* Seek Bar Container (background track) */
+        .seek-bar-container {
+            height: 0.375rem; /* Thinner seek bar */
+            background-color: #4a5568; /* Darker background for the bar */
+            border-radius: 0.1875rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Seek Bar (progress) */
+        .seek-bar {
+            height: 100%;
+            background-color: #8b5cf6; /* Purple color for progress */
+            border-radius: 0.1875rem;
+            width: 0%; /* Initial width */
+        }
+
+        /* Mute/Unmute Toggle Button */
+        .mute-toggle-btn {
+            width: 2.5rem; /* Smaller button for mute toggle */
+            height: 2.5rem;
+            background-color: transparent; /* Transparent background */
+            color: #a0aec0; /* Light gray icon color */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .mute-toggle-btn:hover {
+            color: #cbd5e0; /* Slightly lighter on hover */
+        }
+
+        /* Download Button */
+        .download-btn {
+            font-size: 0.95rem; /* Slightly smaller font for button */
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Re-using btn-primary's gradient for consistency */
+            background: linear-gradient(135deg, #bc80ff, #9933ff); /* Purple gradient */
+            color: #000000;
+            border-radius: 0.5rem; /* Adjust as needed */
+            box-shadow: 0 4px 15px rgba(188, 128, 255, 0.3); /* Purple shadow */
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .download-btn:hover::before {
+            left: 100%;
+        }
+        .download-btn:hover {
+            background: linear-gradient(135deg, #9933ff, #7b30e0); /* Darker purple gradient */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(188, 128, 255, 0.4); /* Purple shadow */
+        }
+
+        /* Buffering Box */
+        .buffer-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            display: none; /* Hidden by default */
+            z-index: 10; /* Ensure it's on top */
+        }
+
+        /* Wave Animation Styles */
+        .wave-animation {
+            width: 3rem; /* Fixed width for the animation area */
+            height: 1.5rem; /* Fixed height for the animation area */
+            display: flex;
+            align-items: flex-end; /* Bars grow from the bottom */
+            justify-content: space-between; /* Space out the bars */
+            gap: 0.25rem; /* Smaller gap between bars */
+            margin-right: 0.5rem; /* Space before mute button */
+            visibility: hidden; /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+        }
+
+        .wave-animation.playing {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .wave-bar {
+            width: 0.25rem; /* Width of each individual bar */
+            height: 0.25rem; /* Minimum height when not animating */
+            background-color: #c4b5fd; /* Light purple for bars */
+            border-radius: 0.125rem; /* Slightly rounded ends */
+            transform-origin: bottom; /* Crucial for animation to scale from bottom */
+        }
+
+        /* Keyframe animations for staggered wave effect */
+        @keyframes wave-up-down-1 {
+            0%, 100% { height: 0.25rem; }
+            25% { height: 1.25rem; }
+            75% { height: 0.75rem; }
+        }
+
+        @keyframes wave-up-down-2 {
+            0%, 100% { height: 0.25rem; }
+            35% { height: 1.5rem; }
+            65% { height: 0.5rem; }
+        }
+
+        @keyframes wave-up-down-3 {
+            0%, 100% { height: 0.25rem; }
+            45% { height: 1.0rem; }
+            85% { height: 0.35rem; }
+        }
+
+        .wave-animation.playing .wave-bar:nth-child(1) { animation: wave-up-down-1 1.2s infinite ease-in-out; }
+        .wave-animation.playing .wave-bar:nth-child(2) { animation: wave-up-down-2 1.0s infinite ease-in-out; }
+        .wave-animation.playing .wave-bar:nth-child(3) { animation: wave-up-down-1 1.1s infinite ease-in-out; }
+        .wave-animation.playing .wave-bar:nth-child(4) { animation: wave-up-down-3 1.3s infinite ease-in-out; }
+        .wave-animation.playing .wave-bar:nth-child(5) { animation: wave-up-down-2 0.9s infinite ease-in-out; }
+
+        /* Loading animation for download button */
+        .audio-loading {
+            display: inline-block;
+            width: 1.25rem; /* Smaller size for loader */
+            height: 1.25rem;
+            border: 2px solid #fff; /* White border */
+            border-radius: 50%;
+            border-top-color: #000; /* Black top border for contrast */
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Background gradient animations for the body */
+        .bg-animated {
+            background: linear-gradient(-45deg, #000000, #111111, #0a0a0a, #000000);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Scroll indicator at the top of the page */
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, #bc80ff, #9933ff); /* Purple gradient */
+            transform-origin: left;
+            transform: scaleX(0); /* Hidden initially */
+            z-index: 999;
+            transition: transform 0.1s ease;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-heading {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 1rem;
+                margin: 0.5rem 0;
+            }
+            
+            #player-container {
+                max-width: 95%; /* Adjust for smaller screens */
+                padding: 1rem 0;
+            }
+
+            .audio-player-block {
+                padding: 1rem;
+            }
+            
+            .btn-primary {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .visualizer-container {
+                height: 50px;
+            }
+            
+            .message-box-content {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .section-heading {
+                font-size: 1.8rem;
+            }
+            
+            .grid {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased bg-animated">
+
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+
+    <!-- Message Box HTML -->
+    <div id="messageBox" class="message-box-overlay" role="dialog" aria-modal="true" aria-labelledby="messageBoxTitle">
+        <div class="message-box-content">
+            <h3 id="messageBoxTitle" class="text-xl font-semibold mb-3 text-white">Information</h3>
+            <p id="messageBoxText" class="text-gray-300"></p>
+            <button onclick="hideMessageBox()" class="focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">OK</button>
+        </div>
+    </div>
+
+    <!-- Main Content Wrapper to handle overall centering and padding -->
+    <div class="main-content-wrapper">
+        <!-- Hero Section -->
+        <section class="min-h-screen flex items-center justify-center p-4">
+            <div class="text-center max-w-4xl">
+                <h1 class="hero-title text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4">
+                    I'm Jake Mottola
+                </h1>
+                <p class="hero-subtitle text-xl sm:text-2xl text-purple-300 mb-8">
+                    Freelance AI/ML Engineer
+                </p>
+                <p class="hero-subtitle text-lg sm:text-xl text-gray-300 leading-relaxed mb-10 px-4 md:px-8">
+                    To truly rival human cognition, we must strive to create artificial intelligence that embodies the paradoxical essence of perfection... namely, embracing imperfection itself... That's my game. I don't build sassy little assistants, I create poetic poets with whiskey for blood. They whisper their love for you, they sing, they spit bars, and shout obscenities to your requests. They're designed so that you not only hear what is said but feel it as well.
+                </p>
+                <a href="#projects" class="hero-button btn-primary focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="View My Projects">
+                    View My Projects
+                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- Specializations Section -->
+        <section id="specializations" class="py-16">
+            <h2 class="section-heading">My Specializations</h2>
+            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Voice Models Card -->
+                <div class="card flex flex-col items-center text-center">
+                    <div class="text-5xl text-purple-400 mb-4" aria-hidden="true">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-white">Expressive Voice Models</h3>
+                    <p class="text-gray-300 mb-4">
+                        Art as your AI/ML engineering partner for innovative, tailored solutions in a rapidly evolving field.
+                    </p>
+                    <div class="visualizer-container mt-auto" role="img" aria-label="Voice visualizer bars">
+                        <div class="visualizer-bar"></div>
+                        <div class="visualizer-bar"></div>
+                        <div class="visualizer-bar"></div>
+                        <div class="visualizer-bar"></div>
+                        <div class="visualizer-bar"></div>
+                        <div class="visualizer-bar"></div>
+                        <div class="visualizer-bar"></div>
+                        <div class="visualizer-bar"></div>
+                        <div class="visualizer-bar"></div>
+                        <div class="visualizer-bar"></div>
+                    </div>
+                </div>
+
+                <!-- Chatbots Card -->
+                <div class="card flex flex-col items-center text-center">
+                    <div class="text-5xl text-green-400 mb-4" aria-hidden="true">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.105A9.754 9.754 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-white">Chatbots</h3>
+                    <p class="text-gray-300 mb-6">
+                        Designing and implementing intelligent conversational agents for various applications.
+                    </p>
+                    <button onclick="showMessageBox('Chatbots: Intelligent conversation systems designed for seamless user interaction with advanced NLP capabilities.')" class="btn-primary mt-auto focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">Learn More</button>
+                </div>
+
+                <!-- Frameworks Card -->
+                <div class="card flex flex-col items-center text-center">
+                    <div class="text-5xl text-red-400 mb-4" aria-hidden="true">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-white">Frameworks</h3>
+                    <p class="text-gray-300 mb-6">
+                        Proficient in leading AI/ML frameworks to build robust and scalable solutions.
+                    </p>
+                    <button onclick="showMessageBox('Frameworks: Expertise in TensorFlow, PyTorch, Scikit-learn, Hugging Face, and more for scalable AI/ML solutions.')" class="btn-primary mt-auto focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">Explore</button>
+                </div>
+
+                <!-- Vector Databases Card -->
+                <div class="card flex flex-col items-center text-center">
+                    <div class="text-5xl text-purple-400 mb-4" aria-hidden="true">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0v10l-8 4m8-14L12 3v10l8 4m0-10V7M4 7v10l8 4m0-10L4 7m8 4v2"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-white">Vector Databases</h3>
+                    <p class="text-gray-300 mb-6">
+                        Implementing efficient vector search and data management for AI applications.
+                    </p>
+                    <button onclick="showMessageBox('Vector Databases: Experience with Pinecone, Milvus, Weaviate, and Chroma for efficient similarity search and data retrieval.')" class="btn-primary mt-auto focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">Details</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-16">
+            <h2 class="section-heading">Featured Projects</h2>
+            <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                <!-- Calypso Project Description -->
+                <div class="card p-8">
+                    <h3 class="text-3xl font-bold text-white mb-4">Calypso: Autonomous AI Streamer</h3>
+                    <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                        Calypso represents my flagship personal project - an innovative, fully autonomous AI streamer powered by cutting-edge large language models. This sophisticated system integrates three state-of-the-art AI models to generate expressive speech, thoughts, and movements, creating a seamless and perfect reflection of life.
+                    </p>
+                    <ul class="list-disc list-inside text-gray-400 mb-6 space-y-2">
+                        <li>Fully autonomous streaming capabilities</li>
+                        <li>Integration of three state-of-the-art AI models</li>
+                        <li>Generates expressive speech, thoughts, and movements</li>
+                        <li>Real-time interaction and emotional responses</li>
+                        <li>Advanced voice synthesis with personality traits</li>
+                    </ul>
+                    <a href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer" class="btn-primary flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Join the Calypso Discord Server">
+                        Join the Discord Server
+                        <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                </div>
+
+                <!-- Calypso Audio Samples -->
+                <!-- This section's structure is now driven by the new jQuery script -->
+                <div id="player-container">
+                    <!-- Header Section -->
+                    <div class="text-center mb-4 px-4">
+                        <h1 class="text-3xl font-bold text-gray-100">Calypso: Whisper Audio Samples</h1>
+                        <p class="text-gray-400 mt-2 text-base">Experience the expressive voice features from Calypso with these audio demonstrations.</p>
+                    </div>
+
+                    <!-- Audio Players Wrapper - blocks will be dynamically inserted here by JavaScript -->
+                    <div id="audio-players-wrapper" class="flex flex-col gap-6 px-4">
+                        <!-- Audio player blocks will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Let's Work Together / Contact Section -->
+        <section id="contact" class="py-16 text-center">
+            <h2 class="section-heading">Let's Work Together</h2>
+            <p class="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+                Ready to bring your AI/ML vision to life? Whether you have a specific project in mind or just want to discuss possibilities, feel free to reach out!
+            </p>
+            <a href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer" class="btn-primary text-xl px-8 py-3 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50" aria-label="Join Jake's Discord Server">
+                Join My Discord Server
+                <svg class="ml-3 w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+            </svg>
+        </a>
+    </section>
+    </div> <!-- End of main-content-wrapper -->
+
+    <script>
+        // Cache frequently accessed DOM elements for performance
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        const messageBox = document.getElementById('messageBox');
+        const messageBoxText = document.getElementById('messageBoxText');
+        
+        /**
+         * Smooth scrolls to the target section when a navigation link is clicked.
+         */
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        /**
+         * Updates the scroll progress indicator at the top of the page.
+         * The indicator's width scales with the scroll position.
+         */
+        function updateScrollIndicator() {
+            // Calculate current scroll position relative to document height
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.body.offsetHeight - window.innerHeight;
+            // Prevent division by zero if content is shorter than viewport
+            const scrollPercent = docHeight > 0 ? scrollTop / docHeight : 0;
+            
+            // Apply the calculated width to the scroll indicator
+            scrollIndicator.style.transform = `scaleX(${scrollPercent})`;
+            scrollIndicator.setAttribute('aria-valuenow', Math.round(scrollPercent * 100));
+        }
+
+        // Add scroll event listener to update the indicator
+        window.addEventListener('scroll', updateScrollIndicator);
+        // Initial call to set the indicator position on page load
+        updateScrollIndicator();
+
+        /**
+         * Uses Intersection Observer to animate elements into view as they scroll into the viewport.
+         */
+        const observerOptions = {
+            root: null, // relative to the viewport
+            rootMargin: '0px',
+            threshold: 0.1 // Trigger when 10% of the element is visible
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Add 'animate-in' class when element enters viewport
+                    entry.target.classList.add('animate-in');
+                } else {
+                    // Optionally remove 'animate-in' when element leaves viewport
+                    // This allows re-animation if the user scrolls back up
+                    entry.target.classList.remove('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe section headings and cards for animation
+        document.querySelectorAll('.section-heading, .card').forEach(el => {
+            observer.observe(el);
+        });
+
+        /**
+         * Displays a custom message box with the given message.
+         * Prevents body scrolling while the message box is open.
+         * @param {string} message - The message to display.
+         */
+        function showMessageBox(message) {
+            messageBoxText.textContent = message;
+            messageBox.classList.add('show');
+            // Prevent body from scrolling when message box is open
+            document.body.style.overflow = 'hidden';
+            // Set focus to the OK button for accessibility
+            messageBox.querySelector('button').focus();
+        }
+
+        /**
+         * Hides the custom message box.
+         * Restores body scrolling.
+         */
+        function hideMessageBox() {
+            messageBox.classList.remove('show');
+            // Restore body scrolling
+            document.body.style.overflow = 'auto';
+        }
+
+        // Event listener to close message box on Escape key press
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && messageBox.classList.contains('show')) {
+                hideMessageBox();
+            }
+        });
+
+        // Event listener to close message box when clicking outside its content
+        messageBox.addEventListener('click', function(event) {
+            if (event.target === this) { // Check if click was on the overlay itself
+                hideMessageBox();
+            }
+        });
+        
+        // Pause all audio when the tab is not visible to save resources
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Using jQuery to iterate over audio elements created dynamically
+                $('#audio-players-wrapper audio').each(function() {
+                    if (!this.paused) {
+                        this.pause();
+                    }
+                });
+            }
+        });
+
+        // Mobile touch optimizations for interactive elements
+        // This adds a subtle transform on touch start to simulate a press effect
+        if ('ontouchstart' in window) {
+            document.querySelectorAll('.card, .btn-primary').forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                }, {passive: true}); // Use passive listener for better scroll performance
+                
+                element.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+        }
+
+        // jQuery script for dynamic audio players
+        $(function () {
+            // Data for each audio sample
+            const audioSamplesData = [
+                {
+                    title: "Sample 1: Expressive Dialogue",
+                    source: "https://framerusercontent.com/assets/X5CtL50ul7XPJdcejxqzC3B4yA.wav"
+                },
+                {
+                    title: "Sample 2: Poetic Narration",
+                    source: "https://framerusercontent.com/assets/vXEtk2NADijQoiYRfbfGYyqxuk.mp3"
+                },
+                {
+                    title: "Sample 3: Fast-Paced Speech",
+                    source: "https://framerusercontent.com/assets/7jDFf73yOCUiEjEsI0cdaml7Jw4.mp3"
+                }
+            ];
+
+            const audioPlayersWrapper = $("#audio-players-wrapper");
+            let activeAudio = null; // Stores the currently playing audio object
+
+            /**
+             * Formats time in seconds into MM:SS format.
+             * @param {number} secs - The time in seconds.
+             * @returns {string} Formatted time string.
+             */
+            function formatTime(secs) {
+                if (isNaN(secs) || secs < 0) return '0:00';
+                const minutes = Math.floor(secs / 60);
+                const seconds = Math.floor(secs % 60);
+                return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+
+            /**
+             * Creates and initializes an individual audio player block.
+             * @param {object} sample - The audio sample data.
+             * @param {number} index - The index of the sample.
+             */
+            function createAudioPlayer(sample, index) {
+                // Construct the HTML for a single audio player block
+                const playerBlock = $(`
+                    <div class="audio-player-block" data-index="${index}">
+                        <h2 class="text-xl font-semibold mb-3 sample-title">${sample.title}</h2>
+                        <div class="flex items-center gap-4 mb-4">
+                            <button class="play-pause-btn" aria-label="Play or Pause audio">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <div class="flex-grow">
+                                <div class="time-display mb-1" aria-live="polite">
+                                    <span class="current-time">0:00</span> / <span class="total-time">0:00</span>
+                                </div>
+                                <div class="seek-bar-container relative" role="slider" aria-label="Audio seek bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="seek-bar absolute" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <!-- Wave Animation -->
+                            <div class="wave-animation" role="img" aria-label="Audio playing visualizer">
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                                <span class="wave-bar"></span>
+                            </div>
+                            <!-- Mute/Unmute Toggle Button -->
+                            <button class="mute-toggle-btn" aria-label="Toggle mute">
+                                <i class="fas fa-volume-up"></i> <!-- Default to unmuted icon -->
+                            </button>
+                        </div>
+                        <a href="${sample.source}" download="${sample.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.mp3" class="download-btn w-full block text-center py-2 px-4 rounded-lg text-base font-medium" aria-label="Download ${sample.title} audio sample">
+                            <i class="fas fa-download mr-2"></i> Download Sample
+                        </a>
+                        <div class="buffer-box" aria-live="assertive" role="status">Buffering ...</div>
+                    </div>
+                `);
+
+                // Get references to elements within this specific player block
+                const audio = new Audio(sample.source);
+                // Set preload to 'none' for lazy loading, will be set to 'metadata' on first interaction
+                audio.preload = 'none'; 
+
+                const playPauseBtn = playerBlock.find('.play-pause-btn');
+                const playPauseIcon = playPauseBtn.find('i');
+                const currentTimeSpan = playerBlock.find('.current-time');
+                const totalTimeSpan = playerBlock.find('.total-time');
+                const seekBarContainer = playerBlock.find('.seek-bar-container');
+                const seekBar = playerBlock.find('.seek-bar');
+                const muteToggleBtn = playerBlock.find('.mute-toggle-btn');
+                const muteToggleIcon = muteToggleBtn.find('i');
+                const waveAnimation = playerBlock.find('.wave-animation'); 
+                const bufferBox = playerBlock.find('.buffer-box');
+                const downloadBtn = playerBlock.find('.download-btn');
+
+                // Set initial volume to unmuted
+                audio.muted = false;
+
+                // Event Listener for first interaction to preload metadata
+                // This replaces the old `mouseenter` logic from previous version
+                playerBlock.one('mouseenter touchstart', () => {
+                    if (audio.preload === 'none') {
+                        audio.preload = 'metadata';
+                        console.log(`Audio ${index + 1} metadata preloaded.`);
+                        // Attempt to load metadata (may not trigger loadedmetadata immediately)
+                        audio.load(); 
+                    }
+                });
+
+                playPauseBtn.on('click', function() {
+                    // Ensure metadata is loaded before attempting to play
+                    if (audio.readyState === 0) { // HAVE_NOTHING
+                        audio.preload = 'metadata';
+                        audio.load();
+                        console.log(`Loading metadata for audio ${index + 1} before play.`);
+                        bufferBox.show(); // Show buffer while loading
+                    }
+
+                    // Pause any currently active audio and stop its animation
+                    if (activeAudio && activeAudio !== audio) {
+                        activeAudio.pause();
+                        $(`[data-index="${activeAudio.dataset.index}"]`).find('.play-pause-btn i').removeClass('fa-pause').addClass('fa-play');
+                        $(`[data-index="${activeAudio.dataset.index}"]`).find('.wave-animation').removeClass('playing');
+                        activeAudio = null; // Clear active audio
+                    }
+
+                    if (audio.paused) {
+                        audio.play().catch(e => {
+                            console.error("Error playing audio:", e);
+                            showMessageBox('Could not play audio. Please check your connection or try again.');
+                            playPauseIcon.removeClass('fa-pause').addClass('fa-play');
+                            waveAnimation.removeClass('playing');
+                            bufferBox.hide();
+                        });
+                        playPauseIcon.removeClass('fa-play').addClass('fa-pause');
+                        waveAnimation.addClass('playing');
+                        activeAudio = audio; // Set this audio as active
+                        activeAudio.dataset.index = index; // Store index for easier access
+                        playPauseBtn.attr('aria-label', 'Pause audio');
+                    } else {
+                        audio.pause();
+                        playPauseIcon.removeClass('fa-pause').addClass('fa-play');
+                        waveAnimation.removeClass('playing');
+                        activeAudio = null;
+                        playPauseBtn.attr('aria-label', 'Play audio');
+                    }
+                });
+
+                muteToggleBtn.on('click', function() {
+                    audio.muted = !audio.muted;
+                    if (audio.muted) {
+                        muteToggleIcon.removeClass('fa-volume-up').addClass('fa-volume-mute');
+                        muteToggleBtn.attr('aria-label', 'Unmute audio');
+                    } else {
+                        muteToggleIcon.removeClass('fa-volume-mute').addClass('fa-volume-up');
+                        muteToggleBtn.attr('aria-label', 'Mute audio');
+                    }
+                });
+
+                audio.addEventListener('loadedmetadata', () => {
+                    totalTimeSpan.text(formatTime(audio.duration));
+                    seekBarContainer.attr('aria-valuemax', Math.round(audio.duration));
+                    bufferBox.hide();
+                });
+
+                audio.addEventListener('timeupdate', () => {
+                    const progress = (audio.currentTime / audio.duration) * 100;
+                    seekBar.css('width', `${progress}%`);
+                    currentTimeSpan.text(formatTime(audio.currentTime));
+                    seekBarContainer.attr('aria-valuenow', Math.round(audio.currentTime));
+                });
+
+                audio.addEventListener('ended', () => {
+                    playPauseIcon.removeClass('fa-pause').addClass('fa-play');
+                    playPauseBtn.attr('aria-label', 'Play audio');
+                    seekBar.css('width', '0%');
+                    currentTimeSpan.text('0:00');
+                    audio.currentTime = 0; // Reset for replay
+                    waveAnimation.removeClass('playing'); // Stop animation
+                    activeAudio = null; // No audio is active
+                });
+
+                audio.addEventListener('waiting', () => {
+                    bufferBox.show();
+                    waveAnimation.removeClass('playing'); // Pause animation if buffering
+                });
+
+                audio.addEventListener('canplay', () => {
+                    bufferBox.hide();
+                    // If audio was previously playing and now can play, restart wave animation
+                    if (audio === activeAudio && !audio.paused) {
+                         waveAnimation.addClass('playing');
+                    }
+                });
+
+                audio.addEventListener('error', (e) => {
+                    console.error(`Audio error for sample ${index + 1}:`, e);
+                    showMessageBox('Error loading or playing this audio sample. Please check the file or try again later.');
+                    bufferBox.hide();
+                    playPauseIcon.removeClass('fa-pause').addClass('fa-play');
+                    waveAnimation.removeClass('playing'); // Stop animation on error
+                    activeAudio = null;
+                });
+
+                seekBarContainer.on('click', function (e) {
+                    const clickX = e.pageX - $(this).offset().left;
+                    const percent = (clickX / $(this).width());
+                    if (!isNaN(audio.duration)) { // Ensure duration is available
+                        audio.currentTime = audio.duration * percent;
+                    }
+                });
+
+                // Handle download button animation
+                downloadBtn.on('click', function(e) {
+                    // Prevent default download behaviour to manage animation, then trigger programmatically
+                    e.preventDefault(); 
+                    const originalHTML = $(this).html();
+                    const downloadUrl = $(this).attr('href');
+                    const fileName = $(this).attr('download');
+
+                    $(this).html('<div class="audio-loading"></div> Downloading...');
+                    $(this).css('pointer-events', 'none');
+
+                    // Simulate the download; in a real scenario, you'd trigger a fetch or direct link
+                    // This creates a temporary invisible link and clicks it
+                    const tempLink = document.createElement('a');
+                    tempLink.href = downloadUrl;
+                    tempLink.download = fileName;
+                    document.body.appendChild(tempLink);
+                    tempLink.click();
+                    document.body.removeChild(tempLink);
+
+                    setTimeout(() => {
+                        $(this).html(originalHTML);
+                        $(this).css('pointer-events', 'auto');
+                        $(this).css('background', 'linear-gradient(135deg, #00ff88, #00cc66)'); // Greenish tint
+                        setTimeout(() => {
+                            $(this).css('background', 'linear-gradient(135deg, #bc80ff, #9933ff)'); // Revert to original purple gradient
+                        }, 1000);
+                    }, 2000); // Simulate 2-second download time + animation
+                });
+
+                audioPlayersWrapper.append(playerBlock);
+            }
+
+            // Create an audio player for each sample in the data array
+            audioSamplesData.forEach((sample, index) => {
+                createAudioPlayer(sample, index);
+            });
+        });
+    </script>
+</body>
+</html>

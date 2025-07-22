@@ -44,8 +44,8 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- jQuery CDN (loaded defer for better performance) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
+    <!-- jQuery CDN (loaded before other scripts to ensure availability) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -990,7 +990,9 @@
         }
 
         // jQuery script for dynamic audio players
-        $(function () {
+        // Ensure jQuery is ready before initializing audio players
+        function initAudioPlayers() {
+            console.log("Initializing audio players");
             // Data for each audio sample
             const audioSamplesData = [
                 {
@@ -1483,7 +1485,20 @@
             additionalAudioSamplesData.forEach((sample, index) => {
                 createAdditionalAudioPlayer(sample, index);
             });
+        }
+        
+        // Run initialization when jQuery is ready
+        $(document).ready(function() {
+            initAudioPlayers();
+            console.log("Audio players ready");
         });
+        
+        // Fallback initialization if document.ready doesn't trigger properly
+        if (typeof jQuery !== 'undefined') {
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                setTimeout(initAudioPlayers, 1); // Small delay to ensure DOM is fully processed
+            }
+        }
     </script>
 </body>
 </html>

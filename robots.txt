@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://elevellm.dev/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Block access to sensitive directories (if any)
+Disallow: /private/
+Disallow: /admin/
+Disallow: /.git/
+
+# Allow access to important assets
+Allow: /audio/
+Allow: /logo/
+Allow: *.css
+Allow: *.js
+Allow: *.png
+Allow: *.jpg
+Allow: *.jpeg
+Allow: *.webp
+Allow: *.svg
+Allow: *.ico
+Allow: *.wav
+Allow: *.mp3

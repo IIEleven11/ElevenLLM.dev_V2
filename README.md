@@ -1,4 +1,4 @@
-# Jake Mottola - AI/ML Engineer Portfolio
+# Jake Mottola - AI/ML Engineer Portfolio.
 
 A modern, SEO-optimized portfolio website showcasing AI/ML engineering services, voice model samples, and the Kalypso autonomous AI streamer project.
 

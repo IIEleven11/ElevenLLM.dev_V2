@@ -1502,12 +1502,12 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       onDragEnd: function () {
         const instance = draggableInstance[0];
+        const vx = typeof instance.getVelocity === "function" ? instance.getVelocity("x") : 0;
+        const vy = typeof instance.getVelocity === "function" ? instance.getVelocity("y") : 0;
         addTerminalMessage(
           `DRAGGABLE.INERTIA({TARGET: '${
             element.className
-          }', VELOCITY: {X: ${instance.getVelocity("x").toFixed(
-            2
-          )}, Y: ${instance.getVelocity("y").toFixed(2)}}});`,
+          }', VELOCITY: {X: ${vx.toFixed(2)}, Y: ${vy.toFixed(2)}}});`,
           true
         );
       }

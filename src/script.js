@@ -1474,12 +1474,12 @@ document.addEventListener("DOMContentLoaded", function () {
         addTerminalMessage(`PANEL DRAG INITIATED: ${element.className}`);
       },
       onDragEnd: function () {
+        const vx = typeof this.getVelocity === "function" ? this.getVelocity("x") : 0;
+        const vy = typeof this.getVelocity === "function" ? this.getVelocity("y") : 0;
         addTerminalMessage(
           `DRAGGABLE.INERTIA({TARGET: '${
             element.className
-          }', VELOCITY: {X: ${this.getVelocity("x").toFixed(
-            2
-          )}, Y: ${this.getVelocity("y").toFixed(2)}}});`,
+          }', VELOCITY: {X: ${vx.toFixed(2)}, Y: ${vy.toFixed(2)}}});`,
           true
         );
       }

@@ -1468,7 +1468,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function makePanelDraggable(element, handle = null) {
-    Draggable.create(element, {
+    const draggableInstance = Draggable.create(element, {
       type: "x,y",
       edgeResistance: 0.65,
       bounds: document.body,
@@ -1501,12 +1501,13 @@ document.addEventListener("DOMContentLoaded", function () {
         addTerminalMessage(`PANEL DRAG INITIATED: ${element.className}`);
       },
       onDragEnd: function () {
+        const instance = draggableInstance[0];
         addTerminalMessage(
           `DRAGGABLE.INERTIA({TARGET: '${
             element.className
-          }', VELOCITY: {X: ${this.getVelocity("x").toFixed(
+          }', VELOCITY: {X: ${instance.getVelocity("x").toFixed(
             2
-          )}, Y: ${this.getVelocity("y").toFixed(2)}}});`,
+          )}, Y: ${instance.getVelocity("y").toFixed(2)}}});`,
           true
         );
       }

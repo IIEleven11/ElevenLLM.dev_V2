@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ElevenLLM.dev</title>
+    <link href="https://fonts.cdnfonts.com/css/red-hat-mono" rel="stylesheet" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="backdrop backdrop-planet" aria-hidden="true"></div>
+    <div class="backdrop backdrop-grid" aria-hidden="true"></div>
+    <div class="backdrop backdrop-glow" aria-hidden="true"></div>
+
+    <div class="shell">
+      <header class="topbar panel">
+        <div class="topbar-brand">
+          <span class="topbar-kicker">ELEVENLLM.DEV</span>
+          <strong>Jacob Mottola</strong>
+        </div>
+        <div class="topbar-meta">
+          <span id="timestamp">TIME: 00:00:00</span>
+          <span class="status-pill"><span class="status-dot"></span> ONLINE</span>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel hero" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="eyebrow">Freelance AI / ML engineer</p>
+            <h1 id="hero-title">Custom voice, image, and text systems with a sharp visual identity.</h1>
+            <p class="lede">
+              I build custom voice models, image models, text models, LoRA fine-tunes, and vector databases.
+              The goal is not generic output. It is work that feels specific, intentional, and alive.
+            </p>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="#audio-lab">LISTEN</a>
+              <a class="btn" href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer">APPLY</a>
+              <a class="btn" href="mailto:JakeMottola6@gmail.com">EMAIL ME</a>
+            </div>
+          </div>
+          <div class="hero-card card-accent">
+            <div class="mini-stat">
+              <span>MODEL RESPONSE</span>
+              <strong id="peak-value">127ms</strong>
+            </div>
+            <div class="mini-stat">
+              <span>INFERENCE SPEED</span>
+              <strong id="amplitude-value">2.4K tok/s</strong>
+            </div>
+            <div class="mini-stat">
+              <span>TEMPERATURE</span>
+              <strong id="phase-value">0.7</strong>
+            </div>
+            <div class="sig-line"></div>
+          </div>
+        </section>
+
+        <section class="panel intro-card" aria-labelledby="intro-title">
+          <div class="panel-header">
+            <span class="panel-label" id="intro-title">WELCOME</span>
+            <span class="panel-tag">PORTFOLIO REVISION</span>
+          </div>
+          <p class="intro-text">
+            Hi, I'm Jake. I focus on systems that sound and feel specific instead of generic. My past work is best
+            explored through the demo audio below, and the rest of my work is on GitHub and Hugging Face.
+          </p>
+          <p class="intro-text">
+            If you'd like to work together, use the Discord link or email. The mobile version keeps the same content,
+            but the layout now collapses naturally instead of relying on fixed desktop overlays.
+          </p>
+        </section>
+
+        <section class="panel contact-card" aria-labelledby="contact-title">
+          <div class="panel-header">
+            <span class="panel-label" id="contact-title">CONTACT</span>
+            <span class="panel-tag">DIRECT LINKS</span>
+          </div>
+          <div class="contact-list">
+            <a class="contact-item" href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer">
+              <img src="./assets/logos/discord_logo.png" alt="Discord logo" />
+              <span>Discord</span>
+            </a>
+            <div class="contact-item contact-item-static">
+              <img src="./assets/logos/gmail_Logo.png" alt="Email logo" />
+              <span>JakeMottola6@gmail.com</span>
+            </div>
+            <a class="contact-item" href="https://github.com/IIEleven11" target="_blank" rel="noopener noreferrer">
+              <img src="./assets/logos/Github_Logo.png" alt="GitHub logo" />
+              <span>GitHub</span>
+            </a>
+            <a class="contact-item" href="https://huggingface.co/IIEleven11" target="_blank" rel="noopener noreferrer">
+              <img src="./assets/logos/HF_Logo.png" alt="Hugging Face logo" />
+              <span>Hugging Face</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="panel controls-card" aria-labelledby="controls-title">
+          <div class="panel-header">
+            <span class="panel-label" id="controls-title">SYSTEM CONTROLS</span>
+            <span class="panel-tag">DISPLAY TUNING</span>
+          </div>
+          <div class="control-group">
+            <label for="density-slider">GRID DENSITY <span id="density-value">32</span></label>
+            <input type="range" id="density-slider" min="16" max="64" value="32" step="4" />
+          </div>
+          <div class="control-group">
+            <label for="glow-slider">GLOW INTENSITY <span id="glow-value">1.0</span></label>
+            <input type="range" id="glow-slider" min="0.5" max="2.5" value="1" step="0.1" />
+          </div>
+          <div class="control-group">
+            <label for="motion-slider">MOTION SPEED <span id="motion-value">1.0</span></label>
+            <input type="range" id="motion-slider" min="0.2" max="2.5" value="1" step="0.1" />
+          </div>
+          <div class="control-group">
+            <label for="contrast-slider">CONTRAST <span id="contrast-value">1.0</span></label>
+            <input type="range" id="contrast-slider" min="0.8" max="1.4" value="1" step="0.01" />
+          </div>
+          <div class="button-row">
+            <button class="btn" id="reset-btn" type="button">RESET</button>
+            <button class="btn btn-primary" id="analyze-btn" type="button">ANALYZE</button>
+          </div>
+        </section>
+
+        <section class="panel terminal-card" aria-labelledby="terminal-title">
+          <div class="panel-header">
+            <span class="panel-label" id="terminal-title">SYSTEM TERMINAL</span>
+            <span id="terminal-status">ONLINE</span>
+          </div>
+          <div class="terminal-log" id="terminal-content" aria-live="polite">
+            <div class="terminal-line">NEXUS PORTFOLIO INITIALIZED.</div>
+            <div class="terminal-line command-line">responsive.layout.enable(true);</div>
+            <div class="terminal-line regular-line">three.js scene replaced with lightweight html/css/js modules.</div>
+            <div class="terminal-line command-line">audio.visualizer.bind({ fftSize: 2048, smoothing: 0.8 });</div>
+            <div class="terminal-line typing"></div>
+          </div>
+        </section>
+
+        <section class="panel audio-card" id="audio-lab" aria-labelledby="audio-title">
+          <div class="panel-header">
+            <span class="panel-label" id="audio-title">AUDIO SPECTRUM ANALYZER</span>
+            <span class="panel-tag">DEMO SAMPLES</span>
+          </div>
+
+          <div class="visualizer-stack">
+            <canvas id="spectrum-canvas" class="visualizer visualizer-spectrum" width="900" height="320"></canvas>
+            <canvas id="waveform-canvas" class="visualizer visualizer-waveform" width="900" height="160"></canvas>
+          </div>
+
+          <div class="readout-grid" aria-label="Audio readouts">
+            <div class="readout-item">
+              <span>API RESPONSE TIME</span>
+              <strong id="audio-response">127ms</strong>
+            </div>
+            <div class="readout-item">
+              <span>INFERENCE SPEED</span>
+              <strong id="audio-speed">2.4K tok/s</strong>
+            </div>
+            <div class="readout-item">
+              <span>MODEL TEMPERATURE</span>
+              <strong id="audio-temperature">0.7</strong>
+            </div>
+          </div>
+
+          <div class="track-grid">
+            <button class="demo-track-btn" data-url="./assets/audio/Female_sample.mp3" type="button">Female Sample</button>
+            <button class="demo-track-btn" data-url="./assets/audio/Male_Sample.mp3" type="button">Male Sample</button>
+            <button class="demo-track-btn" data-url="./assets/audio/Dutch_Sample.mp3" type="button">Dutch Sample</button>
+            <button class="demo-track-btn" data-url="./assets/audio/trump_sample_converted.mp3" type="button">Male Sample 2</button>
+            <button class="demo-track-btn" data-url="./assets/audio/venture_sample1_converted.mp3" type="button">Male Sample 3</button>
+            <button class="demo-track-btn" data-url="./assets/audio/kaly_step3.mp3" type="button">Whispering Sample</button>
+          </div>
+
+          <div class="upload-row">
+            <input type="file" id="audio-file-input" accept="audio/*" />
+            <button class="btn" id="file-btn" type="button">UPLOAD AUDIO FILE</button>
+            <div class="file-label" id="file-label">NO FILE SELECTED</div>
+          </div>
+
+          <audio id="audio-player" crossorigin="anonymous"></audio>
+
+          <div class="control-group sensitivity-group">
+            <label for="sensitivity-slider">SENSITIVITY <span id="sensitivity-value">5.0</span></label>
+            <input type="range" id="sensitivity-slider" min="1" max="10" value="5" step="0.1" />
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

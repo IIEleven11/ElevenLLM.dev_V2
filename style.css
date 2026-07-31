@@ -659,11 +659,13 @@ input[type="range"] {
   .layout {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+    grid-template-rows: auto auto auto auto;
     grid-template-areas:
       "hero hero"
       "intro controls"
       "audio audio"
       "terminal terminal";
+    gap: 1rem;
     align-items: stretch;
   }
 
@@ -678,25 +680,21 @@ input[type="range"] {
   .intro-card {
     grid-area: intro;
     align-self: stretch;
-    height: 100%;
+    min-height: 0;
   }
 
   .controls-card {
     grid-area: controls;
     align-self: stretch;
-    height: 100%;
+    min-height: 0;
   }
 
   .audio-card {
     grid-area: audio;
-    grid-column: 1 / -1;
   }
 
   .terminal-card {
     grid-area: terminal;
-    grid-column: 1 / -1;
-    justify-self: stretch;
-    width: 100%;
   }
 
   .readout-grid {

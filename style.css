@@ -178,6 +178,7 @@ body::before {
 #terminal-status,
 .topbar strong,
 h1,
+h2,
 .lede,
 .intro-text {
   text-transform: uppercase;
@@ -256,7 +257,8 @@ h1,
   color: var(--text-dim);
 }
 
-h1 {
+h1,
+h2 {
   margin: 0;
   font-size: clamp(1.95rem, 5vw, 4.2rem);
   line-height: 0.98;
@@ -316,6 +318,14 @@ h1 {
   border-radius: 16px;
   background: linear-gradient(180deg, rgba(22, 38, 49, 0.88), rgba(8, 14, 18, 0.72));
   overflow: hidden;
+}
+
+.hero-contact {
+  overflow: visible;
+}
+
+.hero-contact .contact-list {
+  grid-template-columns: 1fr;
 }
 
 .card-accent::before {
@@ -649,26 +659,25 @@ input[type="range"] {
   .layout {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-    align-items: start;
+    align-items: stretch;
   }
 
   .hero {
     grid-column: 1 / -1;
   }
 
-  .intro-card,
-  .contact-card,
-  .controls-card,
-  .terminal-card {
+  .hero-contact {
     align-self: start;
   }
 
-  .audio-card {
-    grid-column: 1 / -1;
+  .intro-card,
+  .controls-card {
+    height: 100%;
   }
 
-  .contact-list {
-    grid-template-columns: 1fr;
+  .audio-card,
+  .terminal-card {
+    grid-column: 1 / -1;
   }
 
   .readout-grid {

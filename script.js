@@ -37,9 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function cacheElements() {
   const ids = [
     "timestamp",
-    "peak-value",
-    "amplitude-value",
-    "phase-value",
     "audio-response",
     "audio-speed",
     "audio-temperature",
@@ -363,10 +360,6 @@ function updateReadouts(audioActive) {
   const response = Math.round(120 + modifier * 1.4);
   const speed = (2.2 + modifier * 0.18).toFixed(1);
   const temperature = (0.65 + state.glow * 0.08).toFixed(2);
-
-  elements["peak-value"].textContent = `${response}ms`;
-  elements["amplitude-value"].textContent = `${speed}K tok/s`;
-  elements["phase-value"].textContent = temperature;
 
   elements["audio-response"].textContent = `${response}ms`;
   elements["audio-speed"].textContent = `${speed}K tok/s`;

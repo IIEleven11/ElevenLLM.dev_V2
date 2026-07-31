@@ -28,31 +28,40 @@
         <section class="panel hero" aria-labelledby="hero-title">
           <div class="hero-copy">
             <p class="eyebrow">Freelance AI / ML engineer</p>
-            <h1 id="hero-title">Custom voice, image, and text systems with a sharp visual identity.</h1>
+            <h3 id="hero-title">Custom voice, image, and text systems with a sharp visual identity.</h3>
             <p class="lede">
               I build custom voice models, image models, text models, LoRA fine-tunes, and vector databases.
               The goal is not generic output. It is work that feels specific, intentional, and alive.
             </p>
             <div class="cta-row">
-              <a class="btn btn-primary" href="#audio-lab">LISTEN</a>
-              <a class="btn" href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer">APPLY</a>
+              <a class="btn btn-primary" href="#audio-lab">LISTEN TO MY WORK</a>
+              <a class="btn" href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer">JOIN MY DISCORD</a>
               <a class="btn" href="mailto:JakeMottola6@gmail.com">EMAIL ME</a>
             </div>
           </div>
-          <div class="hero-card card-accent">
-            <div class="mini-stat">
-              <span>MODEL RESPONSE</span>
-              <strong id="peak-value">127ms</strong>
+          <div class="hero-card contact-card hero-contact" aria-labelledby="contact-title-hero">
+            <div class="panel-header">
+              <span class="panel-label" id="contact-title-hero">CONTACT</span>
+              <span class="panel-tag">DIRECT LINKS</span>
             </div>
-            <div class="mini-stat">
-              <span>INFERENCE SPEED</span>
-              <strong id="amplitude-value">2.4K tok/s</strong>
+            <div class="contact-list">
+              <a class="contact-item" href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/logos/discord_logo.png" alt="Discord logo" />
+                <span>Discord</span>
+              </a>
+              <div class="contact-item contact-item-static">
+                <img src="./assets/logos/gmail_Logo.png" alt="Email logo" />
+                <span>JakeMottola6@gmail.com</span>
+              </div>
+              <a class="contact-item" href="https://github.com/IIEleven11" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/logos/Github_Logo.png" alt="GitHub logo" />
+                <span>GitHub</span>
+              </a>
+              <a class="contact-item" href="https://huggingface.co/IIEleven11" target="_blank" rel="noopener noreferrer">
+                <img src="./assets/logos/HF_Logo.png" alt="Hugging Face logo" />
+                <span>Hugging Face</span>
+              </a>
             </div>
-            <div class="mini-stat">
-              <span>TEMPERATURE</span>
-              <strong id="phase-value">0.7</strong>
-            </div>
-            <div class="sig-line"></div>
           </div>
         </section>
 
@@ -69,31 +78,6 @@
             If you'd like to work together, use the Discord link or email. The mobile version keeps the same content,
             but the layout now collapses naturally instead of relying on fixed desktop overlays.
           </p>
-        </section>
-
-        <section class="panel contact-card" aria-labelledby="contact-title">
-          <div class="panel-header">
-            <span class="panel-label" id="contact-title">CONTACT</span>
-            <span class="panel-tag">DIRECT LINKS</span>
-          </div>
-          <div class="contact-list">
-            <a class="contact-item" href="https://discord.gg/mQr8YSSKYk" target="_blank" rel="noopener noreferrer">
-              <img src="./assets/logos/discord_logo.png" alt="Discord logo" />
-              <span>Discord</span>
-            </a>
-            <div class="contact-item contact-item-static">
-              <img src="./assets/logos/gmail_Logo.png" alt="Email logo" />
-              <span>JakeMottola6@gmail.com</span>
-            </div>
-            <a class="contact-item" href="https://github.com/IIEleven11" target="_blank" rel="noopener noreferrer">
-              <img src="./assets/logos/Github_Logo.png" alt="GitHub logo" />
-              <span>GitHub</span>
-            </a>
-            <a class="contact-item" href="https://huggingface.co/IIEleven11" target="_blank" rel="noopener noreferrer">
-              <img src="./assets/logos/HF_Logo.png" alt="Hugging Face logo" />
-              <span>Hugging Face</span>
-            </a>
-          </div>
         </section>
 
         <section class="panel controls-card" aria-labelledby="controls-title">
@@ -120,20 +104,6 @@
           <div class="button-row">
             <button class="btn" id="reset-btn" type="button">RESET</button>
             <button class="btn btn-primary" id="analyze-btn" type="button">ANALYZE</button>
-          </div>
-        </section>
-
-        <section class="panel terminal-card" aria-labelledby="terminal-title">
-          <div class="panel-header">
-            <span class="panel-label" id="terminal-title">SYSTEM TERMINAL</span>
-            <span id="terminal-status">ONLINE</span>
-          </div>
-          <div class="terminal-log" id="terminal-content" aria-live="polite">
-            <div class="terminal-line">NEXUS PORTFOLIO INITIALIZED.</div>
-            <div class="terminal-line command-line">responsive.layout.enable(true);</div>
-            <div class="terminal-line regular-line">three.js scene replaced with lightweight html/css/js modules.</div>
-            <div class="terminal-line command-line">audio.visualizer.bind({ fftSize: 2048, smoothing: 0.8 });</div>
-            <div class="terminal-line typing"></div>
           </div>
         </section>
 
@@ -183,6 +153,20 @@
           <div class="control-group sensitivity-group">
             <label for="sensitivity-slider">SENSITIVITY <span id="sensitivity-value">5.0</span></label>
             <input type="range" id="sensitivity-slider" min="1" max="10" value="5" step="0.1" />
+          </div>
+        </section>
+
+        <section class="panel terminal-card" aria-labelledby="terminal-title">
+          <div class="panel-header">
+            <span class="panel-label" id="terminal-title">SYSTEM TERMINAL</span>
+            <span id="terminal-status">ONLINE</span>
+          </div>
+          <div class="terminal-log" id="terminal-content" aria-live="polite">
+            <div class="terminal-line">NEXUS PORTFOLIO INITIALIZED.</div>
+            <div class="terminal-line command-line">responsive.layout.enable(true);</div>
+            <div class="terminal-line regular-line">three.js scene replaced with lightweight html/css/js modules.</div>
+            <div class="terminal-line command-line">audio.visualizer.bind({ fftSize: 2048, smoothing: 0.8 });</div>
+            <div class="terminal-line typing"></div>
           </div>
         </section>
       </main>

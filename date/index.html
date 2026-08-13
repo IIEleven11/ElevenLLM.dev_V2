@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!--
+    ╔══════════════════════════════════════════════════════════╗
+    ║  EMAIL SETUP — One-time config required (5 min)          ║
+    ║  1. Go to https://emailjs.com and create a free account  ║
+    ║  2. Add a service (Gmail → connect jakemottola6@gmail.com)║
+    ║  3. Create a template — subject: "SHE SAID YES 🎉"        ║
+    ║     Body: "{{name}} said YES to {{restaurant}}! 🍷"       ║
+    ║  4. Replace the three EMAILJS_* values below              ║
+    ╚══════════════════════════════════════════════════════════╝
+    -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A Question For You...</title>
+    <link href="https://fonts.cdnfonts.com/css/red-hat-mono" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+      // ── EMAILJS CONFIG ─────────────────────────────────────
+      const EMAILJS_PUBLIC_KEY  = "SlGKatEOamjcjvKcu";   // Account → API Keys
+      const EMAILJS_SERVICE_ID  = "service_n5hx87j";   // Email Services tab
+      const EMAILJS_TEMPLATE_ID = "template_uvm7vo3";  // Email Templates tab
+      // ───────────────────────────────────────────────────────
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    </script>
+    <style>
+      :root {
+        --bg: #0f181f;
+        --bg-2: #13222b;
+        --text: #d4d8dc;
+        --text-dim: #7f8a93;
+        --accent: #ff9e3d;
+        --accent-soft: rgba(255, 158, 61, 0.16);
+        --border: rgba(255, 158, 61, 0.24);
+        --panel: rgba(17, 29, 38, 0.88);
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+        --green: #4ade80;
+        --red: #f87171;
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body {
+        height: 100%;
+        font-family: "Red Hat Mono", monospace, sans-serif;
+        background: radial-gradient(circle at top, rgba(255,158,61,0.12), transparent 32%),
+                    linear-gradient(180deg, #091018 0%, #0f181f 48%, #0b1217 100%);
+        color: var(--text);
+        text-transform: uppercase;
+        overflow-x: hidden;
+        color-scheme: dark;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+        background-size: 32px 32px;
+        opacity: 0.06;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── glow ── */
+      .glow {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255,158,61,0.08), transparent 70%);
+      }
+
+      /* ── shell ── */
+      .shell {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px 16px 48px;
+      }
+
+      /* ── topbar ── */
+      .topbar {
+        width: 100%;
+        max-width: 720px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 40px;
+        backdrop-filter: blur(12px);
+      }
+      .topbar-brand { font-size: 11px; letter-spacing: 0.12em; color: var(--accent); }
+      .topbar-tag { font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em; }
+
+      /* ── screens ── */
+      .screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 680px; }
+      .screen.active { display: flex; }
+
+      /* ── panel card ── */
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 32px;
+        width: 100%;
+        backdrop-filter: blur(12px);
+        box-shadow: var(--shadow);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      .card-label { font-size: 10px; letter-spacing: 0.14em; color: var(--accent); }
+      .card-tag { font-size: 10px; letter-spacing: 0.1em; color: var(--text-dim); }
+
+      /* ── intro screen ── */
+      #screen-intro .tagline {
+        font-size: clamp(18px, 4vw, 28px);
+        font-weight: 700;
+        line-height: 1.4;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      #screen-intro .sub {
+        font-size: 12px;
+        color: var(--text-dim);
+        margin-bottom: 32px;
+      }
+      #screen-intro .proceed-btn {
+        align-self: flex-start;
+      }
+
+      /* ── question screen ── */
+      .question-text {
+        font-size: clamp(14px, 2.8vw, 18px);
+        line-height: 1.6;
+        margin-bottom: 28px;
+        color: var(--text);
+      }
+      .question-text strong { color: var(--accent); }
+
+      .restaurants {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 32px;
+      }
+      @media (max-width: 480px) { .restaurants { grid-template-columns: 1fr; } }
+
+      .restaurant-card {
+        background: rgba(17, 29, 38, 0.6);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px 16px;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s, transform 0.15s;
+        text-align: left;
+      }
+      .restaurant-card:hover {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        transform: translateY(-2px);
+      }
+      .restaurant-card.selected {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(255,158,61,0.14);
+      }
+      .restaurant-card .r-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 6px;
+      }
+      .restaurant-card .r-addr {
+        font-size: 10px;
+        color: var(--text-dim);
+        line-height: 1.5;
+      }
+      .restaurant-card .r-num {
+        font-size: 10px;
+        color: var(--text-dim);
+        margin-bottom: 8px;
+        letter-spacing: 0.08em;
+      }
+
+      /* ── action row ── */
+      .action-row {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        flex-wrap: wrap;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(8px);
+        transition: opacity 0.3s, transform 0.3s;
+      }
+      .action-row.visible {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+
+      /* ── buttons ── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 28px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
+      }
+      .btn:active { transform: scale(0.97); }
+
+      .btn-yes {
+        background: var(--accent);
+        color: #0f181f;
+        border-color: var(--accent);
+      }
+      .btn-yes:hover {
+        background: #ffb563;
+        border-color: #ffb563;
+        box-shadow: 0 0 24px rgba(255,158,61,0.4);
+      }
+
+      .btn-no {
+        background: transparent;
+        color: var(--text-dim);
+        border-color: rgba(127,138,147,0.3);
+        position: relative;
+        transition: background 0.15s, border-color 0.15s, transform 0.1s, left 0.12s, top 0.12s;
+      }
+      .btn-no:hover { border-color: rgba(127,138,147,0.5); }
+
+      .btn-outline {
+        background: transparent;
+        color: var(--accent);
+        border-color: var(--border);
+      }
+      .btn-outline:hover {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+      }
+
+      /* ── no screen ── */
+      #screen-no { gap: 28px; }
+      .pepe-wrap {
+        width: 100%;
+        max-width: 420px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+      }
+      .pepe-wrap img { width: 100%; display: block; }
+      .sad-label {
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        color: var(--text-dim);
+        margin-top: -4px;
+      }
+
+      /* ── yes screen ── */
+      #screen-yes { gap: 28px; }
+
+      .confetti-wrap {
+        font-size: 48px;
+        letter-spacing: 0.1em;
+        filter: drop-shadow(0 0 12px rgba(255,158,61,0.6));
+        animation: pulse 1.8s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+      }
+
+      .confirm-detail {
+        font-size: 11px;
+        color: var(--text-dim);
+        line-height: 1.7;
+        text-align: center;
+      }
+      .confirm-detail strong { color: var(--accent); }
+
+      .status-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 10px;
+        color: var(--text-dim);
+      }
+      .dot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 8px var(--green);
+        animation: blink 2s ease-in-out infinite;
+      }
+      .dot.pending { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+      .dot.error   { background: var(--red);   box-shadow: 0 0 8px var(--red);   animation: none; }
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+
+      /* ── scanline flicker ── */
+      @keyframes scanline {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(100vh); }
+      }
+      .scanline {
+        position: fixed;
+        left: 0; right: 0;
+        height: 2px;
+        background: rgba(255,158,61,0.04);
+        pointer-events: none;
+        z-index: 99;
+        animation: scanline 6s linear infinite;
+      }
+
+      /* ── misc ── */
+      .divider {
+        width: 100%;
+        height: 1px;
+        background: var(--border);
+        margin: 8px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <div class="shell">
+      <header class="topbar">
+        <span class="topbar-brand">ELEVENLLM.DEV</span>
+        <span class="topbar-tag">PRIVATE TRANSMISSION</span>
+      </header>
+
+      <!-- ══ INTRO ══════════════════════════════════════════════ -->
+      <div id="screen-intro" class="screen active" role="main">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-label">INCOMING MESSAGE</span>
+            <span class="card-tag">FROM: JAKE</span>
+          </div>
+
+          <p class="tagline">Hey Kyoka, I have a question for you.</p>
+          <p class="sub">[ PRESS OPEN TO CONTINUE ]</p>
+
+          <button class="btn btn-outline proceed-btn" onclick="goTo('screen-question')">
+            OPEN MESSAGE
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ QUESTION ════════════════════════════════════════════ -->
+      <div id="screen-question" class="screen" role="main">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-label">THE QUESTION</span>
+            <span class="card-tag">SELECT VENUE → RESPOND</span>
+          </div>
+
+          <p class="question-text">
+            Do you want to <strong>eat good food and get buzzed on wine</strong> at...
+          </p>
+
+          <div class="restaurants" role="radiogroup" aria-label="Choose a restaurant">
+            <button
+              class="restaurant-card"
+              id="r1"
+              onclick="selectRestaurant(this, 'Fisherman Jack\'s')"
+              role="radio"
+              aria-checked="false"
+            >
+              <div class="r-num">OPTION 01</div>
+              <div class="r-name">Fisherman Jack's</div>
+              <div class="r-addr">1410 Seiner Dr<br>Everett, WA 98201</div>
+            </button>
+
+            <button
+              class="restaurant-card"
+              id="r2"
+              onclick="selectRestaurant(this, 'Anthony\'s HomePort Everett')"
+              role="radio"
+              aria-checked="false"
+            >
+              <div class="r-num">OPTION 02</div>
+              <div class="r-name">Anthony's HomePort</div>
+              <div class="r-addr">1726 W Marine View Dr<br>Everett, WA 98201</div>
+            </button>
+          </div>
+
+          <div class="action-row" id="action-row">
+            <button class="btn btn-yes" onclick="handleYes()">&#10003; YES PLEASE</button>
+            <button class="btn btn-no" id="no-btn" onmouseenter="dodgeNo(this)" onclick="handleNo()">✗ NO</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ NO ══════════════════════════════════════════════════ -->
+      <div id="screen-no" class="screen" role="main" aria-label="Rejection screen">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-label">RESPONSE RECEIVED</span>
+            <span class="card-tag">STATUS: SAD</span>
+          </div>
+          <p class="question-text" style="text-align:center; margin-bottom:0;">
+            ...ok. :(
+          </p>
+        </div>
+
+        <div class="pepe-wrap">
+          <img src="./pepe_fork.jpg" alt="Sad Pepe with fork" />
+        </div>
+
+        <p class="sad-label">[ TRANSMISSION ENDED ]</p>
+      </div>
+
+      <!-- ══ YES ══════════════════════════════════════════════════ -->
+      <div id="screen-yes" class="screen" role="main" aria-label="Confirmation screen">
+        <div class="card" style="text-align:center;">
+          <div class="card-header" style="justify-content:center; border:none; margin-bottom:16px; padding-bottom:0;">
+            <span class="card-label">RESPONSE CONFIRMED</span>
+          </div>
+
+          <div class="confetti-wrap" id="emoji-display">🍷</div>
+
+          <div style="height:20px;"></div>
+
+          <p class="question-text" id="confirm-restaurant" style="margin-bottom:4px;">
+            <strong>Loading...</strong>
+          </p>
+
+          <div class="divider"></div>
+
+          <p class="confirm-detail" id="confirm-detail">
+            <!-- filled by JS -->
+          </p>
+
+          <div style="height:20px;"></div>
+
+          <div class="status-row" style="justify-content:center;" id="email-status">
+            <span class="dot pending" id="email-dot"></span>
+            <span id="email-label">NOTIFYING JAKE...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ── state ─────────────────────────────────────────────────
+      let selectedRestaurant = null;
+      let noClickCount = 0;
+
+      const RESTAURANTS = {
+        "Fisherman's Jack's": {
+          addr: "1410 Seiner Dr, Everett WA",
+          emoji: "🦞",
+          detail: "Seafood &amp; wine at Fisherman Jack's — 1410 Seiner Dr, Everett WA"
+        },
+        "Fisherman Jack's": {
+          addr: "1410 Seiner Dr, Everett WA",
+          emoji: "🦞",
+          detail: "Seafood &amp; wine at <strong>Fisherman Jack's</strong><br>1410 Seiner Dr, Everett, WA 98201"
+        },
+        "Anthony's HomePort Everett": {
+          addr: "1726 W Marine View Dr, Everett WA",
+          emoji: "⚓",
+          detail: "Waterfront dining at <strong>Anthony's HomePort Everett</strong><br>1726 W Marine View Dr, Everett, WA 98201"
+        }
+      };
+
+      // ── screen transitions ────────────────────────────────────
+      function goTo(id) {
+        document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+      }
+
+      // ── restaurant selection ───────────────────────────────────
+      function selectRestaurant(el, name) {
+        document.querySelectorAll(".restaurant-card").forEach(c => {
+          c.classList.remove("selected");
+          c.setAttribute("aria-checked", "false");
+        });
+        el.classList.add("selected");
+        el.setAttribute("aria-checked", "true");
+        selectedRestaurant = name;
+
+        const row = document.getElementById("action-row");
+        row.classList.add("visible");
+      }
+
+      // ── no button dodge ────────────────────────────────────────
+      function dodgeNo(btn) {
+        noClickCount++;
+        if (noClickCount > 4) return; // let them click it eventually
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const rect = btn.getBoundingClientRect();
+        const maxX = Math.min(180, vw - rect.right - 10);
+        const maxY = Math.min(80, vh - rect.bottom - 10);
+        const dx = (Math.random() - 0.5) * 2 * Math.min(maxX, 120);
+        const dy = (Math.random() - 0.5) * 2 * Math.min(maxY, 60);
+        btn.style.position = "relative";
+        btn.style.left = dx + "px";
+        btn.style.top  = dy + "px";
+      }
+
+      // ── handlers ──────────────────────────────────────────────
+      function handleNo() {
+        goTo("screen-no");
+      }
+
+      function handleYes() {
+        if (!selectedRestaurant) return;
+        const info = RESTAURANTS[selectedRestaurant] || {};
+
+        // populate yes screen
+        document.getElementById("confirm-restaurant").innerHTML =
+          `You said <strong style="color:var(--accent)">YES</strong> to ${selectedRestaurant}! ${info.emoji || "🍷"}`;
+        document.getElementById("confirm-detail").innerHTML =
+          (info.detail || selectedRestaurant) + "<br><br>Jake's going to be so happy. 😊";
+        document.getElementById("emoji-display").textContent = info.emoji || "🍷";
+
+        goTo("screen-yes");
+        sendNotification(selectedRestaurant, info.addr || "");
+      }
+
+      // ── emailjs notification ───────────────────────────────────
+      function sendNotification(restaurant, address) {
+        const dot   = document.getElementById("email-dot");
+        const label = document.getElementById("email-label");
+
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          restaurant: restaurant,
+          address:    address,
+          to_email:   "jakemottola6@gmail.com",
+          subject:    "SHE SAID YES 🎉"
+        })
+        .then(() => {
+          dot.className   = "dot";
+          label.textContent = "JAKE HAS BEEN NOTIFIED ✓";
+        })
+        .catch(err => {
+          dot.className   = "dot error";
+          label.textContent = "NOTIFY FAILED — TELL HIM YOURSELF 😅";
+          console.error("EmailJS error:", err);
+        });
+      }
+    </script>
+  </body>
+</html>

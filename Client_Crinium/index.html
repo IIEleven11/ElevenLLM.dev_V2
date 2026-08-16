@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client Intake Form — ElevenLLM.dev</title>
+    <link href="https://fonts.cdnfonts.com/css/red-hat-mono" rel="stylesheet" />
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+      /* ── TOKENS (matching parent site) ── */
+      :root {
+        --bg: #0f181f;
+        --bg-2: #13222b;
+        --text: #d4d8dc;
+        --text-dim: #7f8a93;
+        --accent: #ff9e3d;
+        --accent-soft: rgba(255, 158, 61, 0.16);
+        --border: rgba(255, 158, 61, 0.24);
+        --panel: rgba(17, 29, 38, 0.82);
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+        color-scheme: dark;
+      }
+
+      * { box-sizing: border-box; }
+
+      html { height: 100%; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Red Hat Mono", monospace, sans-serif;
+        background:
+          radial-gradient(circle at top, rgba(255, 158, 61, 0.12), transparent 32%),
+          linear-gradient(180deg, #091018 0%, #0f181f 48%, #0b1217 100%);
+        color: var(--text);
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+        background-size: 32px 32px;
+        opacity: 0.06;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .backdrop-glow {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(circle at 20% 15%, rgba(255,158,61,0.18), transparent 22%),
+          radial-gradient(circle at 80% 20%, rgba(255,193,153,0.1), transparent 18%),
+          radial-gradient(circle at 50% 80%, rgba(255,158,61,0.08), transparent 24%);
+        filter: blur(24px);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── SHELL ── */
+      .shell {
+        position: relative;
+        z-index: 1;
+        width: min(860px, calc(100vw - 1.25rem));
+        margin: 0 auto;
+        padding: 1rem 0 3rem;
+      }
+
+      /* ── TOPBAR ── */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.9rem 1rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(180deg, rgba(26,43,55,0.9), rgba(13,22,29,0.86));
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+        animation: rise 800ms ease both;
+      }
+
+      .topbar-brand { display: flex; flex-direction: column; gap: 0.2rem; }
+      .topbar-kicker {
+        font-size: 0.73rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .topbar-brand strong { font-size: 1rem; color: var(--text); text-transform: uppercase; }
+
+      .topbar-back {
+        font-size: 0.73rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        text-decoration: none;
+        padding: 0.45rem 0.85rem;
+        border: 1px solid rgba(255,158,61,0.18);
+        border-radius: 999px;
+        background: rgba(255,158,61,0.06);
+        transition: border-color 180ms, background 180ms;
+      }
+      .topbar-back:hover {
+        border-color: rgba(255,158,61,0.5);
+        background: rgba(255,158,61,0.12);
+        color: var(--text);
+      }
+
+      /* ── PANEL ── */
+      .panel {
+        position: relative;
+        background: linear-gradient(180deg, rgba(26,43,55,0.9), rgba(13,22,29,0.86));
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+        padding: 1.4rem 1.6rem;
+        margin-bottom: 1rem;
+        animation: rise 800ms ease both;
+      }
+
+      .panel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(135deg, rgba(255,158,61,0.12), transparent 40%);
+        pointer-events: none;
+        opacity: 0.5;
+      }
+
+      .panel:nth-child(2)  { animation-delay: 40ms; }
+      .panel:nth-child(3)  { animation-delay: 80ms; }
+      .panel:nth-child(4)  { animation-delay: 120ms; }
+      .panel:nth-child(5)  { animation-delay: 160ms; }
+      .panel:nth-child(6)  { animation-delay: 200ms; }
+      .panel:nth-child(7)  { animation-delay: 240ms; }
+      .panel:nth-child(8)  { animation-delay: 280ms; }
+      .panel:nth-child(9)  { animation-delay: 320ms; }
+      .panel:nth-child(10) { animation-delay: 360ms; }
+      .panel:nth-child(11) { animation-delay: 400ms; }
+      .panel:nth-child(12) { animation-delay: 440ms; }
+      .panel:nth-child(13) { animation-delay: 480ms; }
+      .panel:nth-child(14) { animation-delay: 520ms; }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1.2rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255,158,61,0.14);
+      }
+      .panel-label {
+        font-size: 0.73rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .panel-tag {
+        font-size: 0.73rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+
+      /* ── INTRO CALLOUT ── */
+      .callout {
+        font-size: 0.82rem;
+        letter-spacing: 0.04em;
+        color: #a6b0b8;
+        line-height: 1.7;
+        margin: 0 0 1.2rem;
+        padding: 0.9rem 1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255,158,61,0.14);
+        background: rgba(255,158,61,0.04);
+        text-transform: none;
+      }
+      .callout strong { color: var(--accent); }
+
+      /* ── FORM ELEMENTS ── */
+      .question-block {
+        margin-bottom: 1.4rem;
+      }
+      .question-block:last-of-type {
+        margin-bottom: 0;
+      }
+
+      .q-label {
+        display: block;
+        font-size: 0.78rem;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 0.45rem;
+      }
+
+      .q-hint {
+        font-size: 0.73rem;
+        color: var(--text-dim);
+        text-transform: none;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.6rem;
+        display: block;
+        line-height: 1.6;
+      }
+
+      textarea,
+      input[type="text"],
+      input[type="date"],
+      input[type="email"] {
+        width: 100%;
+        background: rgba(4, 8, 11, 0.5);
+        border: 1px solid rgba(255,158,61,0.18);
+        border-radius: 12px;
+        color: var(--text);
+        font-family: inherit;
+        font-size: 0.82rem;
+        letter-spacing: 0.04em;
+        padding: 0.75rem 0.9rem;
+        outline: none;
+        transition: border-color 180ms;
+        resize: vertical;
+        text-transform: none;
+      }
+
+      textarea:focus,
+      input[type="text"]:focus,
+      input[type="date"]:focus,
+      input[type="email"]:focus {
+        border-color: rgba(255,158,61,0.55);
+        background: rgba(4, 8, 11, 0.7);
+      }
+
+      textarea { min-height: 7rem; }
+      textarea.short { min-height: 4rem; }
+
+      /* ── CHECKBOXES / RADIOS ── */
+      .check-list {
+        display: grid;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .check-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        font-size: 0.78rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        padding: 0.55rem 0.8rem;
+        border-radius: 10px;
+        border: 1px solid rgba(255,158,61,0.1);
+        background: rgba(4, 8, 11, 0.3);
+        transition: border-color 180ms, background 180ms, color 180ms;
+        user-select: none;
+      }
+
+      .check-item:hover {
+        border-color: rgba(255,158,61,0.35);
+        background: rgba(255,158,61,0.05);
+        color: var(--text);
+      }
+
+      .check-item input[type="checkbox"],
+      .check-item input[type="radio"] {
+        width: 1rem;
+        height: 1rem;
+        flex-shrink: 0;
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
+
+      .check-item:has(input:checked) {
+        border-color: rgba(255,158,61,0.5);
+        background: rgba(255,158,61,0.08);
+        color: var(--text);
+      }
+
+      .inline-input {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.4rem;
+      }
+      .inline-input label {
+        font-size: 0.73rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+      }
+      .inline-input input[type="text"] {
+        flex: 1;
+        min-width: 0;
+        padding: 0.45rem 0.7rem;
+      }
+
+      /* ── DIVIDER ── */
+      .q-divider {
+        height: 1px;
+        background: rgba(255,158,61,0.1);
+        margin: 1.2rem 0;
+      }
+
+      /* ── SUBMIT ROW ── */
+      .submit-panel {
+        padding: 1.4rem 1.6rem;
+      }
+
+      .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 3rem;
+        padding: 0.8rem 2.4rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255,158,61,0.4);
+        background: linear-gradient(180deg, rgba(255,158,61,0.22), rgba(255,158,61,0.08));
+        color: var(--accent);
+        font-family: inherit;
+        font-size: 0.82rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 180ms, border-color 180ms, background 180ms;
+        width: 100%;
+      }
+
+      .btn-submit:hover:not(:disabled) {
+        transform: translateY(-2px);
+        border-color: rgba(255,158,61,0.65);
+        background: linear-gradient(180deg, rgba(255,158,61,0.32), rgba(255,158,61,0.14));
+      }
+
+      .btn-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* ── STATUS MESSAGES ── */
+      #form-status {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.85rem 1rem;
+        border-radius: 12px;
+        font-size: 0.78rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        text-align: center;
+      }
+
+      #form-status.success {
+        display: block;
+        border: 1px solid rgba(80, 220, 130, 0.4);
+        background: rgba(80, 220, 130, 0.08);
+        color: #6fddaa;
+      }
+
+      #form-status.error {
+        display: block;
+        border: 1px solid rgba(255, 80, 80, 0.4);
+        background: rgba(255, 80, 80, 0.08);
+        color: #ff9090;
+      }
+
+      /* ── ANIMATIONS ── */
+      @keyframes rise {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.6; transform: scale(0.95); }
+        50%       { opacity: 1;   transform: scale(1.12); }
+      }
+
+      .status-dot {
+        display: inline-block;
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 18px rgba(255,158,61,0.9);
+        animation: pulse 2.6s ease-in-out infinite;
+        vertical-align: middle;
+        margin-right: 0.35rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="backdrop-glow" aria-hidden="true"></div>
+
+    <div class="shell">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-brand">
+          <span class="topbar-kicker">ELEVENLLM.DEV</span>
+          <strong>Client Intake</strong>
+        </div>
+        <a class="topbar-back" href="https://elevenllm.dev">← Back to site</a>
+      </header>
+
+      <!-- INTRO PANEL -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">PROJECT INTAKE FORM</span>
+          <span class="panel-tag"><span class="status-dot"></span>SECURE SUBMISSION</span>
+        </div>
+        <div class="callout">
+          <strong>You do not need to know the technical answers.</strong> If you aren't sure about something, just explain what you want to happen in your own words. I can determine the technical approach.<br><br>
+          The more detail you can provide, the more accurately I can estimate development time, infrastructure requirements, and project cost.
+        </div>
+      </div>
+
+      <form id="intake-form" novalidate>
+
+        <!-- SECTION 1 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">1. Project Overview</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q1_1">1.1 — What are you trying to build?</label>
+            <span class="q-hint">Describe the project in your own words. Don't worry about technical terminology.</span>
+            <textarea id="q1_1" name="q1_1" placeholder="Describe your project..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q1_2">1.2 — What is the primary purpose of the system?</label>
+            <span class="q-hint">What do you ultimately want this system to accomplish?</span>
+            <textarea id="q1_2" name="q1_2" class="short" placeholder="Describe the primary purpose..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q1_3">1.3 — If everything worked exactly as you want, what would you be able to do with it?</label>
+            <textarea id="q1_3" name="q1_3" placeholder="e.g. I would be able to start a simulation, let it run on several GPUs, collect the results, and then review the results remotely."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">1.4 — This is primarily:</label>
+            <div class="check-list">
+              <label class="check-item"><input type="checkbox" name="q1_4" value="Personal / research project"> Personal / research project</label>
+              <label class="check-item"><input type="checkbox" name="q1_4" value="Development / testing environment"> Development / testing environment</label>
+              <label class="check-item"><input type="checkbox" name="q1_4" value="A system I intend to sell"> A system I intend to sell</label>
+              <label class="check-item"><input type="checkbox" name="q1_4" value="A system that other people will access remotely"> A system that other people will access remotely</label>
+              <label class="check-item"><input type="checkbox" name="q1_4" value="A commercial SaaS / service"> A commercial SaaS / service</label>
+              <label class="check-item"><input type="checkbox" name="q1_4" value="A combination of the above"> A combination of the above</label>
+            </div>
+            <div class="inline-input">
+              <label>Other:</label>
+              <input type="text" name="q1_4_other" placeholder="Describe...">
+            </div>
+            <div class="q-divider"></div>
+            <label class="q-label" for="q1_4_explain" style="margin-top:0.8rem;">Please explain:</label>
+            <textarea id="q1_4_explain" name="q1_4_explain" class="short" placeholder="Additional context..."></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">2. What Does the System Actually Run?</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q2_1">2.1 — What software / programs need to run?</label>
+            <span class="q-hint">List anything that needs to be installed or executed.</span>
+            <textarea id="q2_1" name="q2_1" placeholder="List software, programs, dependencies..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">2.2 — Do you already have the software / code?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q2_2_status" value="Yes, most of it"> Yes, most of it</label>
+              <label class="check-item"><input type="radio" name="q2_2_status" value="Yes, but it needs modification"> Yes, but it needs modification</label>
+              <label class="check-item"><input type="radio" name="q2_2_status" value="Some of it"> Some of it</label>
+              <label class="check-item"><input type="radio" name="q2_2_status" value="No, it needs to be developed"> No, it needs to be developed</label>
+              <label class="check-item"><input type="radio" name="q2_2_status" value="I'm not sure"> I'm not sure</label>
+            </div>
+            <label class="q-label" style="margin-top:0.8rem;">Where does the existing code currently live?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="checkbox" name="q2_2_location" value="GitHub"> GitHub</label>
+              <label class="check-item"><input type="checkbox" name="q2_2_location" value="GitLab"> GitLab</label>
+              <label class="check-item"><input type="checkbox" name="q2_2_location" value="Local computer"> Local computer</label>
+              <label class="check-item"><input type="checkbox" name="q2_2_location" value="Cloud storage"> Cloud storage</label>
+              <label class="check-item"><input type="checkbox" name="q2_2_location" value="Docker images"> Docker images</label>
+            </div>
+            <div class="inline-input">
+              <label>Other:</label>
+              <input type="text" name="q2_2_location_other" placeholder="Describe...">
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">2.3 — Approximately how large is the project?</label>
+            <div class="inline-input">
+              <label>Source code size:</label>
+              <input type="text" name="q2_3_code_size" placeholder="e.g. ~200 MB">
+            </div>
+            <div class="inline-input">
+              <label>Models:</label>
+              <input type="text" name="q2_3_models" placeholder="e.g. 14 GB">
+            </div>
+            <div class="inline-input">
+              <label>Datasets:</label>
+              <input type="text" name="q2_3_datasets" placeholder="e.g. 50 GB">
+            </div>
+            <div class="inline-input">
+              <label>Other files / assets:</label>
+              <input type="text" name="q2_3_other_files" placeholder="...">
+            </div>
+            <div class="inline-input">
+              <label>Total storage currently required:</label>
+              <input type="text" name="q2_3_total" placeholder="...">
+            </div>
+            <div class="q-divider"></div>
+            <label class="q-label" for="q2_3_desc">If you don't know, describe the project instead:</label>
+            <textarea id="q2_3_desc" name="q2_3_desc" class="short" placeholder="Describe the scale of the project..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">2.4 — Are there files / data that cannot be publicly exposed?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q2_4" value="Yes"> Yes</label>
+              <label class="check-item"><input type="radio" name="q2_4" value="No"> No</label>
+              <label class="check-item"><input type="radio" name="q2_4" value="I'm not sure"> I'm not sure</label>
+            </div>
+            <label class="q-label" for="q2_4_what" style="margin-top:0.8rem;">If yes, what needs to be protected?</label>
+            <textarea id="q2_4_what" name="q2_4_what" class="short" placeholder="Describe sensitive data..."></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">3. Simulations / GPU Workloads</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q3_1">3.1 — What exactly is being simulated?</label>
+            <span class="q-hint">Please describe what happens during a simulation.</span>
+            <textarea id="q3_1" name="q3_1" placeholder="Describe the simulation..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q3_2">3.2 — What happens when you start a simulation?</label>
+            <span class="q-hint">Describe the process from beginning to end.</span>
+            <textarea id="q3_2" name="q3_2" placeholder="e.g. Start program → load data → distribute work across GPUs → simulation runs → results are saved → results are reviewed."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">3.3 — How long does one simulation normally run?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q3_3_duration" value="Seconds"> Seconds</label>
+              <label class="check-item"><input type="radio" name="q3_3_duration" value="Minutes"> Minutes</label>
+              <label class="check-item"><input type="radio" name="q3_3_duration" value="Hours"> Hours</label>
+              <label class="check-item"><input type="radio" name="q3_3_duration" value="Approximately one day"> Approximately one day</label>
+              <label class="check-item"><input type="radio" name="q3_3_duration" value="Multiple days"> Multiple days</label>
+              <label class="check-item"><input type="radio" name="q3_3_duration" value="Unknown"> Unknown</label>
+            </div>
+            <div class="inline-input">
+              <label>Estimated runtime:</label>
+              <input type="text" name="q3_3_estimate" placeholder="e.g. ~6 hours">
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">3.4 — How many simulations need to run?</label>
+            <div class="inline-input">
+              <label>Per session:</label>
+              <input type="text" name="q3_4_count" placeholder="e.g. 10">
+            </div>
+            <label class="q-label" style="margin-top:0.8rem;">Can simulations run simultaneously?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q3_4_simultaneous" value="Yes"> Yes</label>
+              <label class="check-item"><input type="radio" name="q3_4_simultaneous" value="No"> No</label>
+              <label class="check-item"><input type="radio" name="q3_4_simultaneous" value="I'm not sure"> I'm not sure</label>
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">3.5 — GPU Requirements</label>
+            <div class="inline-input">
+              <label>GPU model(s):</label>
+              <input type="text" name="q3_5_gpu_model" placeholder="e.g. RTX 4090, A100">
+            </div>
+            <div class="inline-input">
+              <label>GPU memory required:</label>
+              <input type="text" name="q3_5_gpu_vram" placeholder="e.g. 80 GB">
+            </div>
+            <div class="inline-input">
+              <label>Number of GPUs simultaneously:</label>
+              <input type="text" name="q3_5_gpu_count" placeholder="e.g. 4">
+            </div>
+            <div class="q-divider"></div>
+            <label class="q-label" for="q3_5_desc">If you don't know, describe what you've previously run it on:</label>
+            <textarea id="q3_5_desc" name="q3_5_desc" class="short" placeholder="Describe previous hardware..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">3.6 — Do the GPUs need to work together as one distributed system?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q3_6" value="Yes"> Yes</label>
+              <label class="check-item"><input type="radio" name="q3_6" value="No — each GPU can run an independent workload"> No — each GPU can run an independent workload</label>
+              <label class="check-item"><input type="radio" name="q3_6" value="Some workloads do, some don't"> Some workloads do, some don't</label>
+              <label class="check-item"><input type="radio" name="q3_6" value="I don't know"> I don't know</label>
+            </div>
+            <label class="q-label" for="q3_6_explain" style="margin-top:0.8rem;">Please explain what you expect multiple GPUs to do:</label>
+            <textarea id="q3_6_explain" name="q3_6_explain" class="short" placeholder="Describe GPU coordination..."></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION 4 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">4. Cloud Infrastructure</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">4.1 — Where do you want the system to run?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="checkbox" name="q4_1" value="SimplePod"> SimplePod</label>
+              <label class="check-item"><input type="checkbox" name="q4_1" value="Thunder Compute"> Thunder Compute</label>
+              <label class="check-item"><input type="checkbox" name="q4_1" value="RunPod"> RunPod</label>
+              <label class="check-item"><input type="checkbox" name="q4_1" value="Vast.ai"> Vast.ai</label>
+              <label class="check-item"><input type="checkbox" name="q4_1" value="AWS"> AWS</label>
+              <label class="check-item"><input type="checkbox" name="q4_1" value="Google Cloud"> Google Cloud</label>
+              <label class="check-item"><input type="checkbox" name="q4_1" value="Azure"> Azure</label>
+              <label class="check-item"><input type="checkbox" name="q4_1" value="I don't know — recommend something"> I don't know — recommend something</label>
+            </div>
+            <div class="inline-input">
+              <label>Other:</label>
+              <input type="text" name="q4_1_other" placeholder="Describe...">
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">4.2 — How frequently will GPU infrastructure be needed?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q4_2" value="Occasionally"> Occasionally</label>
+              <label class="check-item"><input type="radio" name="q4_2" value="A few times per month"> A few times per month</label>
+              <label class="check-item"><input type="radio" name="q4_2" value="Several times per week"> Several times per week</label>
+              <label class="check-item"><input type="radio" name="q4_2" value="Daily"> Daily</label>
+              <label class="check-item"><input type="radio" name="q4_2" value="Continuously"> Continuously</label>
+            </div>
+            <div class="inline-input">
+              <label>Other:</label>
+              <input type="text" name="q4_2_other" placeholder="Describe...">
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">4.3 — Desired workflow (simulations → review)</label>
+            <span class="q-hint">You previously mentioned running simulations for approximately one day and then spending several days reviewing the results. Is this still the intended workflow?</span>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q4_3" value="Yes"> Yes</label>
+              <label class="check-item"><input type="radio" name="q4_3" value="No"> No</label>
+              <label class="check-item"><input type="radio" name="q4_3" value="Mostly — details below"> Mostly — details below</label>
+            </div>
+            <label class="q-label" for="q4_3_workflow" style="margin-top:0.8rem;">Explain the desired workflow:</label>
+            <textarea id="q4_3_workflow" name="q4_3_workflow" class="short" placeholder="Describe the workflow..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">4.4 — Should the GPU infrastructure exist continuously, or only when needed?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q4_4" value="GPUs should remain running"> GPUs should remain running</label>
+              <label class="check-item"><input type="radio" name="q4_4" value="GPUs should be created when needed and destroyed afterward"> GPUs should be created when needed and destroyed afterward</label>
+              <label class="check-item"><input type="radio" name="q4_4" value="I'm not sure"> I'm not sure</label>
+            </div>
+            <div class="inline-input">
+              <label>Other:</label>
+              <input type="text" name="q4_4_other" placeholder="Describe...">
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">4.5 — Target infrastructure budget</label>
+            <span class="q-hint">This is separate from the development fee. Leave blank if unknown — I can estimate after understanding the workload.</span>
+            <div class="inline-input">
+              <label>Approximate monthly cloud budget:</label>
+              <input type="text" name="q4_5_monthly" placeholder="$ amount">
+            </div>
+            <div class="inline-input">
+              <label>Max cost per simulation session:</label>
+              <input type="text" name="q4_5_per_session" placeholder="$ amount">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 5 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">5. Docker / Containers</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q5_1">5.1 — What do you want Docker to do for you?</label>
+            <span class="q-hint">Describe the desired behavior in plain English.</span>
+            <textarea id="q5_1" name="q5_1" placeholder="Describe what you want Docker to handle..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">5.2 — Do you already have Docker containers / images?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q5_2_status" value="Yes"> Yes</label>
+              <label class="check-item"><input type="radio" name="q5_2_status" value="No"> No</label>
+              <label class="check-item"><input type="radio" name="q5_2_status" value="Partially"> Partially</label>
+              <label class="check-item"><input type="radio" name="q5_2_status" value="I'm not sure"> I'm not sure</label>
+            </div>
+            <label class="q-label" for="q5_2_details" style="margin-top:0.8rem;">If yes, please provide whatever you have:</label>
+            <textarea id="q5_2_details" name="q5_2_details" class="short" placeholder="Links, descriptions, or repo details..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">5.3 — How many containers / services are involved?</label>
+            <div class="inline-input">
+              <label>Approximate number:</label>
+              <input type="text" name="q5_3_count" placeholder="e.g. 3">
+            </div>
+            <label class="q-label" for="q5_3_desc" style="margin-top:0.8rem;">If unknown, describe them:</label>
+            <textarea id="q5_3_desc" name="q5_3_desc" class="short" placeholder="Describe containers / services..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">5.4 — Do the containers need to communicate with each other?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q5_4" value="Yes"> Yes</label>
+              <label class="check-item"><input type="radio" name="q5_4" value="No"> No</label>
+              <label class="check-item"><input type="radio" name="q5_4" value="I'm not sure"> I'm not sure</label>
+            </div>
+            <label class="q-label" for="q5_4_how" style="margin-top:0.8rem;">If yes, describe how:</label>
+            <textarea id="q5_4_how" name="q5_4_how" class="short" placeholder="Describe inter-container communication..."></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION 6 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">6. Remote Access</span>
+            <span class="panel-tag">TeamViewer-style access without exposing the system</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">6.1 — What should a remote user be able to see?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="checkbox" name="q6_1" value="Entire desktop"> Entire desktop</label>
+              <label class="check-item"><input type="checkbox" name="q6_1" value="Specific application"> Specific application</label>
+              <label class="check-item"><input type="checkbox" name="q6_1" value="Specific windows"> Specific windows</label>
+              <label class="check-item"><input type="checkbox" name="q6_1" value="Web interface"> Web interface</label>
+              <label class="check-item"><input type="checkbox" name="q6_1" value="Simulation output"> Simulation output</label>
+              <label class="check-item"><input type="checkbox" name="q6_1" value="GPU / CPU monitoring"> GPU / CPU monitoring</label>
+            </div>
+            <div class="inline-input">
+              <label>Other:</label>
+              <input type="text" name="q6_1_other" placeholder="Describe...">
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">6.2 — What should a remote user be able to control?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="checkbox" name="q6_2" value="Mouse"> Mouse</label>
+              <label class="check-item"><input type="checkbox" name="q6_2" value="Keyboard"> Keyboard</label>
+              <label class="check-item"><input type="checkbox" name="q6_2" value="Specific application"> Specific application</label>
+              <label class="check-item"><input type="checkbox" name="q6_2" value="Start / stop simulations"> Start / stop simulations</label>
+              <label class="check-item"><input type="checkbox" name="q6_2" value="Upload files"> Upload files</label>
+              <label class="check-item"><input type="checkbox" name="q6_2" value="Download results"> Download results</label>
+              <label class="check-item"><input type="checkbox" name="q6_2" value="View logs"> View logs</label>
+            </div>
+            <div class="inline-input">
+              <label>Other:</label>
+              <input type="text" name="q6_2_other" placeholder="Describe...">
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">6.3 — Should the user have direct access to the underlying server?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q6_3" value="Yes"> Yes</label>
+              <label class="check-item"><input type="radio" name="q6_3" value="No"> No</label>
+              <label class="check-item"><input type="radio" name="q6_3" value="Absolutely not"> Absolutely not</label>
+              <label class="check-item"><input type="radio" name="q6_3" value="I'm not sure"> I'm not sure</label>
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q6_4">6.4 — Existing middleware / web system</label>
+            <span class="q-hint">You mentioned an existing middleware/web system that displays monitors and relays mouse/keyboard input. Please explain how that system currently works. Include documentation, source code, screenshots, or a demo link if available.</span>
+            <textarea id="q6_4" name="q6_4" placeholder="Describe the existing system..."></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION 7 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">7. Automation</span>
+            <span class="panel-tag">Check all that apply</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">7.1 — What would you like to happen automatically?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="checkbox" name="q7" value="Create cloud GPU instances"> Create cloud GPU instances</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Install / configure software"> Install / configure software</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Start Docker containers"> Start Docker containers</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Start simulations"> Start simulations</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Distribute workloads across GPUs"> Distribute workloads across GPUs</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Monitor GPU usage"> Monitor GPU usage</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Monitor simulation progress"> Monitor simulation progress</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Save logs"> Save logs</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Save simulation results"> Save simulation results</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Shut down GPU instances when finished"> Shut down GPU instances when finished</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Transfer results to storage"> Transfer results to storage</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Generate reports"> Generate reports</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Notify me when a simulation finishes"> Notify me when a simulation finishes</label>
+              <label class="check-item"><input type="checkbox" name="q7" value="Allow users to start simulations themselves"> Allow users to start simulations themselves</label>
+            </div>
+            <div class="inline-input">
+              <label>Other:</label>
+              <input type="text" name="q7_other" placeholder="Describe...">
+            </div>
+            <div class="q-divider"></div>
+            <label class="q-label" for="q7_extra">Describe anything else you'd like automated:</label>
+            <textarea id="q7_extra" name="q7_extra" class="short" placeholder="Additional automation details..."></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION 8 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">8. What Do You Want Me To Build?</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q8">8.1 — Describe what you expect me, as the engineer, to deliver.</label>
+            <span class="q-hint">This section is particularly important. Be as specific as possible.</span>
+            <textarea id="q8" name="q8" placeholder='e.g. "I want you to take my existing project, containerize it, configure the cloud GPU environment, create a way to launch simulations, and make it possible for me to remotely access the system."'></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION 9 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">9. What Do You NOT Need Me To Do?</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q9">9.1 — Are there portions of the project you will handle yourself?</label>
+            <textarea id="q9" name="q9" class="short" placeholder="Describe what you're handling independently..."></textarea>
+          </div>
+        </div>
+
+        <!-- SECTION 10 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">10. Desired Deliverables</span>
+            <span class="panel-tag">Check all that apply</span>
+          </div>
+
+          <div class="question-block">
+            <div class="check-list">
+              <label class="check-item"><input type="checkbox" name="q10" value="Dockerfiles"> Dockerfiles</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Docker Compose configuration"> Docker Compose configuration</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Cloud deployment configuration"> Cloud deployment configuration</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Infrastructure-as-code"> Infrastructure-as-code</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Deployment scripts"> Deployment scripts</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Automation scripts"> Automation scripts</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Web interface"> Web interface</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Remote access system"> Remote access system</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Authentication / user management"> Authentication / user management</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="GPU orchestration"> GPU orchestration</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Monitoring"> Monitoring</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Logging"> Logging</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Documentation"> Documentation</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Installation instructions"> Installation instructions</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Source code"> Source code</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Production deployment"> Production deployment</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Development environment"> Development environment</label>
+              <label class="check-item"><input type="checkbox" name="q10" value="Testing environment"> Testing environment</label>
+            </div>
+            <div class="inline-input">
+              <label>Other:</label>
+              <input type="text" name="q10_other" placeholder="Describe...">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 11 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">11. Timeline</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q11_ideal_date">When would you ideally like the first working version?</label>
+            <input type="date" id="q11_ideal_date" name="q11_ideal_date">
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">Is there a hard deadline?</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q11_hard_deadline" value="Yes"> Yes</label>
+              <label class="check-item"><input type="radio" name="q11_hard_deadline" value="No"> No</label>
+            </div>
+            <label class="q-label" for="q11_deadline_reason" style="margin-top:0.8rem;">If yes, why?</label>
+            <textarea id="q11_deadline_reason" name="q11_deadline_reason" class="short" placeholder="Explain the deadline..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">Is the project expected to be:</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q11_scope" value="One-time development"> One-time development</label>
+              <label class="check-item"><input type="radio" name="q11_scope" value="Ongoing development"> Ongoing development</label>
+              <label class="check-item"><input type="radio" name="q11_scope" value="Development + maintenance"> Development + maintenance</label>
+              <label class="check-item"><input type="radio" name="q11_scope" value="Development + infrastructure management"> Development + infrastructure management</label>
+              <label class="check-item"><input type="radio" name="q11_scope" value="Unknown"> Unknown</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 12 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">12. Budget</span>
+            <span class="panel-tag">You do not need a precise number</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">Target development budget:</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q12_budget" value="Under $1,000"> Under $1,000</label>
+              <label class="check-item"><input type="radio" name="q12_budget" value="$1,000–$2,500"> $1,000–$2,500</label>
+              <label class="check-item"><input type="radio" name="q12_budget" value="$2,500–$5,000"> $2,500–$5,000</label>
+              <label class="check-item"><input type="radio" name="q12_budget" value="$5,000–$10,000"> $5,000–$10,000</label>
+              <label class="check-item"><input type="radio" name="q12_budget" value="$10,000–$20,000"> $10,000–$20,000</label>
+              <label class="check-item"><input type="radio" name="q12_budget" value="$20,000+"> $20,000+</label>
+              <label class="check-item"><input type="radio" name="q12_budget" value="I don't know yet"> I don't know yet</label>
+            </div>
+            <div class="inline-input">
+              <label>Specific target:</label>
+              <input type="text" name="q12_budget_specific" placeholder="$ amount">
+            </div>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label">Would you prefer:</label>
+            <div class="check-list">
+              <label class="check-item"><input type="radio" name="q12_pricing" value="Fixed-price project"> Fixed-price project</label>
+              <label class="check-item"><input type="radio" name="q12_pricing" value="Hourly development"> Hourly development</label>
+              <label class="check-item"><input type="radio" name="q12_pricing" value="Milestone-based pricing"> Milestone-based pricing</label>
+              <label class="check-item"><input type="radio" name="q12_pricing" value="Not sure — recommend an approach"> Not sure — recommend an approach</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 13 -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">13. Additional Information</span>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q13">13.1 — Anything else I should know?</label>
+            <span class="q-hint">Include links to documentation, videos, screenshots, repositories, architecture diagrams, existing Docker files, or anything else that helps explain the project.</span>
+            <textarea id="q13" name="q13" placeholder="Additional context, links, notes..."></textarea>
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q_name">Your Name</label>
+            <input type="text" id="q_name" name="q_name" placeholder="Full name">
+          </div>
+
+          <div class="question-block">
+            <label class="q-label" for="q_email">Your Email</label>
+            <input type="email" id="q_email" name="q_email" placeholder="your@email.com">
+          </div>
+        </div>
+
+        <!-- SUBMIT -->
+        <div class="panel submit-panel">
+          <div class="panel-header">
+            <span class="panel-label">Submit</span>
+            <span class="panel-tag">Sent directly to Jake</span>
+          </div>
+          <p class="callout" style="margin-bottom:1.2rem;">
+            Your responses will be emailed directly to <strong>jakemottola6@gmail.com</strong>. Nothing is stored on this page.
+          </p>
+          <button class="btn-submit" type="submit" id="submit-btn">SEND INTAKE FORM</button>
+          <div id="form-status"></div>
+        </div>
+
+      </form>
+    </div>
+
+    <script type="text/javascript">
+      // ─────────────────────────────────────────────
+      // EmailJS configuration
+      // 1. Sign up free at https://emailjs.com
+      // 2. Add a service (connect your Gmail account)
+      // 3. Create a template — set the "To Email" to
+      //    jakemottola6@gmail.com and the body to {{message}}
+      //    with subject: "Client Intake — {{from_name}}"
+      // 4. Replace the three placeholder values below.
+      // ─────────────────────────────────────────────
+      const EMAILJS_PUBLIC_KEY  = "SlGKatEOamjcjvKcu";   // Account → API Keys
+      const EMAILJS_SERVICE_ID  = "service_n5hx87j";   // Email Services tab
+      const EMAILJS_TEMPLATE_ID = "template_tam0sst";  // Email Templates tab
+
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+      // Collect all checked values for a given checkbox/radio name
+      function collectChecked(name) {
+        return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+          .map(el => el.value).join(", ") || "—";
+      }
+
+      // Collect all checked values for multiple checkbox groups with same name
+      function collectMulti(name) {
+        return collectChecked(name);
+      }
+
+      function val(id) {
+        const el = document.getElementById(id);
+        return el && el.value.trim() ? el.value.trim() : "—";
+      }
+
+      function inputVal(name) {
+        const el = document.querySelector(`input[name="${name}"]`);
+        return el && el.value.trim() ? el.value.trim() : "—";
+      }
+
+      document.getElementById("intake-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const btn    = document.getElementById("submit-btn");
+        const status = document.getElementById("form-status");
+        btn.disabled = true;
+        btn.textContent = "SENDING...";
+        status.className = "";
+        status.style.display = "none";
+
+        // Build formatted message
+        const lines = [
+          "=== CLIENT INTAKE FORM SUBMISSION ===",
+          "",
+          "SUBMITTER",
+          `Name:  ${inputVal("q_name")}`,
+          `Email: ${inputVal("q_email")}`,
+          "",
+          "=== SECTION 1: PROJECT OVERVIEW ===",
+          "",
+          "1.1 — What are you trying to build?",
+          val("q1_1"),
+          "",
+          "1.2 — Primary purpose:",
+          val("q1_2"),
+          "",
+          "1.3 — If everything worked exactly as wanted:",
+          val("q1_3"),
+          "",
+          `1.4 — Project type: ${collectMulti("q1_4")}${inputVal("q1_4_other") !== "—" ? ", Other: " + inputVal("q1_4_other") : ""}`,
+          `1.4 — Explanation: ${val("q1_4_explain")}`,
+          "",
+          "=== SECTION 2: WHAT DOES THE SYSTEM ACTUALLY RUN? ===",
+          "",
+          "2.1 — Software / programs needed:",
+          val("q2_1"),
+          "",
+          `2.2 — Existing code status: ${collectChecked("q2_2_status")}`,
+          `2.2 — Code location: ${collectMulti("q2_2_location")}${inputVal("q2_2_location_other") !== "—" ? ", Other: " + inputVal("q2_2_location_other") : ""}`,
+          "",
+          `2.3 — Source code size:    ${inputVal("q2_3_code_size")}`,
+          `2.3 — Models:              ${inputVal("q2_3_models")}`,
+          `2.3 — Datasets:            ${inputVal("q2_3_datasets")}`,
+          `2.3 — Other files/assets:  ${inputVal("q2_3_other_files")}`,
+          `2.3 — Total storage:       ${inputVal("q2_3_total")}`,
+          `2.3 — Description:         ${val("q2_3_desc")}`,
+          "",
+          `2.4 — Sensitive data: ${collectChecked("q2_4")}`,
+          `2.4 — What needs protection: ${val("q2_4_what")}`,
+          "",
+          "=== SECTION 3: SIMULATIONS / GPU WORKLOADS ===",
+          "",
+          "3.1 — What is being simulated:",
+          val("q3_1"),
+          "",
+          "3.2 — What happens when you start a simulation:",
+          val("q3_2"),
+          "",
+          `3.3 — Duration: ${collectChecked("q3_3_duration")} | Estimate: ${inputVal("q3_3_estimate")}`,
+          "",
+          `3.4 — Number per session: ${inputVal("q3_4_count")} | Simultaneous: ${collectChecked("q3_4_simultaneous")}`,
+          "",
+          `3.5 — GPU model(s): ${inputVal("q3_5_gpu_model")}`,
+          `3.5 — GPU VRAM:     ${inputVal("q3_5_gpu_vram")}`,
+          `3.5 — GPU count:    ${inputVal("q3_5_gpu_count")}`,
+          `3.5 — Previous hardware: ${val("q3_5_desc")}`,
+          "",
+          `3.6 — Distributed: ${collectChecked("q3_6")}`,
+          `3.6 — GPU coordination: ${val("q3_6_explain")}`,
+          "",
+          "=== SECTION 4: CLOUD INFRASTRUCTURE ===",
+          "",
+          `4.1 — Platform(s): ${collectMulti("q4_1")}${inputVal("q4_1_other") !== "—" ? ", Other: " + inputVal("q4_1_other") : ""}`,
+          `4.2 — Frequency: ${collectChecked("q4_2")}${inputVal("q4_2_other") !== "—" ? ", Other: " + inputVal("q4_2_other") : ""}`,
+          `4.3 — Workflow still accurate: ${collectChecked("q4_3")}`,
+          `4.3 — Desired workflow: ${val("q4_3_workflow")}`,
+          `4.4 — Infrastructure lifespan: ${collectChecked("q4_4")}${inputVal("q4_4_other") !== "—" ? ", Other: " + inputVal("q4_4_other") : ""}`,
+          `4.5 — Monthly cloud budget: ${inputVal("q4_5_monthly")} | Per session max: ${inputVal("q4_5_per_session")}`,
+          "",
+          "=== SECTION 5: DOCKER / CONTAINERS ===",
+          "",
+          "5.1 — What Docker should do:",
+          val("q5_1"),
+          "",
+          `5.2 — Existing containers: ${collectChecked("q5_2_status")}`,
+          `5.2 — Details: ${val("q5_2_details")}`,
+          `5.3 — Number of containers: ${inputVal("q5_3_count")}`,
+          `5.3 — Description: ${val("q5_3_desc")}`,
+          `5.4 — Containers communicate: ${collectChecked("q5_4")}`,
+          `5.4 — How: ${val("q5_4_how")}`,
+          "",
+          "=== SECTION 6: REMOTE ACCESS ===",
+          "",
+          `6.1 — User can see:     ${collectMulti("q6_1")}${inputVal("q6_1_other") !== "—" ? ", Other: " + inputVal("q6_1_other") : ""}`,
+          `6.2 — User can control: ${collectMulti("q6_2")}${inputVal("q6_2_other") !== "—" ? ", Other: " + inputVal("q6_2_other") : ""}`,
+          `6.3 — Direct server access: ${collectChecked("q6_3")}`,
+          "",
+          "6.4 — Existing middleware / web system:",
+          val("q6_4"),
+          "",
+          "=== SECTION 7: AUTOMATION ===",
+          "",
+          `7 — Automation requested: ${collectMulti("q7")}${inputVal("q7_other") !== "—" ? ", Other: " + inputVal("q7_other") : ""}`,
+          `7 — Additional automation: ${val("q7_extra")}`,
+          "",
+          "=== SECTION 8: WHAT DO YOU WANT ME TO BUILD? ===",
+          "",
+          val("q8"),
+          "",
+          "=== SECTION 9: WHAT DO YOU NOT NEED ME TO DO? ===",
+          "",
+          val("q9"),
+          "",
+          "=== SECTION 10: DESIRED DELIVERABLES ===",
+          "",
+          `${collectMulti("q10")}${inputVal("q10_other") !== "—" ? ", Other: " + inputVal("q10_other") : ""}`,
+          "",
+          "=== SECTION 11: TIMELINE ===",
+          "",
+          `Ideal first version date: ${inputVal("q11_ideal_date")}`,
+          `Hard deadline: ${collectChecked("q11_hard_deadline")}`,
+          `Deadline reason: ${val("q11_deadline_reason")}`,
+          `Project scope: ${collectChecked("q11_scope")}`,
+          "",
+          "=== SECTION 12: BUDGET ===",
+          "",
+          `Development budget: ${collectChecked("q12_budget")}${inputVal("q12_budget_specific") !== "—" ? " | Specific: " + inputVal("q12_budget_specific") : ""}`,
+          `Pricing preference: ${collectChecked("q12_pricing")}`,
+          "",
+          "=== SECTION 13: ADDITIONAL INFORMATION ===",
+          "",
+          val("q13"),
+        ];
+
+        const message = lines.join("\n");
+
+        try {
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            from_name: inputVal("q_name") !== "—" ? inputVal("q_name") : "Client",
+            from_email: inputVal("q_email") !== "—" ? inputVal("q_email") : "Not provided",
+            message: message,
+          });
+
+          status.className = "success";
+          status.textContent = "Form submitted successfully — Jake will be in touch shortly.";
+          btn.textContent = "SUBMITTED ✓";
+        } catch (err) {
+          console.error("EmailJS error:", err);
+          status.className = "error";
+          status.textContent = "Submission failed. Please email jakemottola6@gmail.com directly.";
+          btn.disabled = false;
+          btn.textContent = "SEND INTAKE FORM";
+        }
+      });
+    </script>
+  </body>
+</html>

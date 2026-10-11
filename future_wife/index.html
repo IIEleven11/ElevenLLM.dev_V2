@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#080910" />
+    <meta name="theme-color" content="#000000" />
     <title>I will win</title>
     <style>
       :root {
@@ -23,17 +23,14 @@
 
       html {
         min-height: 100%;
-        background: #080910;
+        background: #000;
       }
 
       body {
         min-height: 100vh;
         margin: 0;
         color: var(--ink);
-        background:
-          radial-gradient(ellipse at 50% 0%, rgba(91, 69, 137, 0.2), transparent 47%),
-          radial-gradient(ellipse at 10% 70%, rgba(76, 57, 110, 0.12), transparent 36%),
-          #080910;
+        background: #000;
         font-family: Georgia, "Times New Roman", serif;
         line-height: 1.6;
       }
@@ -50,19 +47,37 @@
       body::before {
         background-image:
           radial-gradient(1px 1px at 8% 13%, #fff 99%, transparent),
-          radial-gradient(1px 1px at 21% 76%, #dfd4ff 99%, transparent),
           radial-gradient(1px 1px at 37% 22%, #fff 99%, transparent),
           radial-gradient(1.5px 1.5px at 49% 88%, #fff 99%, transparent),
-          radial-gradient(1px 1px at 63% 11%, #e1d6ff 99%, transparent),
           radial-gradient(1px 1px at 74% 58%, #fff 99%, transparent),
-          radial-gradient(1px 1px at 91% 32%, #ded2ff 99%, transparent),
           radial-gradient(1.5px 1.5px at 88% 83%, #fff 99%, transparent);
         background-size: 330px 310px;
-        opacity: 0.62;
+        animation: twinkle-a 7s ease-in-out infinite;
       }
 
       body::after {
-        background: radial-gradient(ellipse at center, transparent 36%, rgba(4, 4, 10, 0.42));
+        background-image:
+          radial-gradient(1px 1px at 21% 76%, #dfd4ff 99%, transparent),
+          radial-gradient(1px 1px at 63% 11%, #e1d6ff 99%, transparent),
+          radial-gradient(1px 1px at 91% 32%, #ded2ff 99%, transparent),
+          radial-gradient(1.5px 1.5px at 15% 40%, #fff 99%, transparent),
+          radial-gradient(1px 1px at 56% 47%, #fff 99%, transparent);
+        background-size: 410px 370px;
+        animation: twinkle-b 9s ease-in-out infinite 1.5s;
+      }
+
+      @keyframes twinkle-a {
+        0%, 100% { opacity: 0.25; }
+        35% { opacity: 0.8; }
+        45% { opacity: 0.6; }
+        60% { opacity: 0.9; }
+      }
+
+      @keyframes twinkle-b {
+        0%, 100% { opacity: 0.7; }
+        30% { opacity: 0.2; }
+        55% { opacity: 0.85; }
+        70% { opacity: 0.5; }
       }
 
       button,
@@ -196,6 +211,15 @@
         color: var(--violet);
         font-size: 16px;
         text-align: center;
+        animation: star-glow 4.5s ease-in-out infinite;
+      }
+
+      .observation:nth-child(2n) .star { animation-duration: 5.5s; animation-delay: -1.2s; }
+      .observation:nth-child(3n) .star { animation-duration: 6.5s; animation-delay: -2.7s; }
+
+      @keyframes star-glow {
+        0%, 100% { opacity: 0.45; transform: scale(0.92); }
+        50% { opacity: 1; transform: scale(1.08); }
       }
 
       .observation p {

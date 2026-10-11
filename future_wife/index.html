@@ -363,8 +363,7 @@
           The little things
         </p>
         <p class="note">
-          <strong>A place...</strong>
-          Just a place to remember what I appreciate.
+          Just a place to remember.
         </p>
       </section>
 
@@ -432,7 +431,9 @@
     </main>
 
     <script>
-      const storageKey = "small-constellation-notes";
+      // Firebase Realtime Database URL, e.g. "https://your-project-default-rtdb.firebaseio.com"
+      const databaseURL = "https://wife-176ae-default-rtdb.firebaseio.com/";
+      const legacyStorageKey = "small-constellation-notes";
       const list = document.querySelector("#observations");
       const form = document.querySelector("#add-form");
       const input = document.querySelector("#new-observation");
@@ -449,17 +450,63 @@
         count.textContent = `${total} ${total === 1 ? "star" : "stars"}`;
       }
 
-      function persistNotes() {
+      async function api(path, options) {
+        if (!databaseURL) {
+          throw new Error("Database URL is not configured.");
+        }
+        const response = await fetch(`${databaseURL.replace(/\/$/, "")}/${path}.json`, options);
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+        }
+        return response.json();
+      }
+
+      async function fetchNotes() {
+        const data = await api("notes");
+        if (!data) {
+          return [];
+        }
+        // Push IDs sort chronologically.
+        return Object.keys(data)
+          .sort()
+          .filter((id) => typeof data[id] === "string")
+          .map((id) => ({ id, text: data[id] }));
+      }
+
+      async function refreshNotes() {
         try {
-          localStorage.setItem(storageKey, JSON.stringify(savedNotes));
-          return true;
+          const notes = await fetchNotes();
+          if (JSON.stringify(notes) !== JSON.stringify(savedNotes)) {
+            savedNotes = notes;
+            renderSavedNotes();
+            updateCount();
+          }
         } catch {
-          announce("Could not save in this browser. The note is still here for this visit.");
-          return false;
+          announce("Could not reach the shared list. Check your connection.");
         }
       }
 
-      function renderNote(note, index) {
+      async function migrateLegacyNotes() {
+        try {
+          const stored = localStorage.getItem(legacyStorageKey);
+          if (stored === null) {
+            return;
+          }
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            for (const text of parsed) {
+              if (typeof text === "string") {
+                await api("notes", { method: "POST", body: JSON.stringify(text) });
+              }
+            }
+          }
+          localStorage.removeItem(legacyStorageKey);
+        } catch {
+          // Leave legacy notes in place and retry on next load.
+        }
+      }
+
+      function renderNote(note) {
         const item = document.createElement("li");
         item.className = "observation";
 
@@ -469,21 +516,24 @@
         star.textContent = "✦";
 
         const text = document.createElement("p");
-        text.textContent = note;
+        text.textContent = note.text;
 
         const remove = document.createElement("button");
         remove.className = "remove";
         remove.type = "button";
         remove.textContent = "Remove";
-        remove.setAttribute("aria-label", `Remove note: ${note}`);
-        remove.addEventListener("click", () => {
-          savedNotes.splice(index, 1);
-          item.remove();
-          const saved = persistNotes();
-          renderSavedNotes();
-          updateCount();
-          if (saved) {
+        remove.setAttribute("aria-label", `Remove note: ${note.text}`);
+        remove.addEventListener("click", async () => {
+          remove.disabled = true;
+          try {
+            await api(`notes/${note.id}`, { method: "DELETE" });
+            savedNotes = savedNotes.filter((saved) => saved.id !== note.id);
+            renderSavedNotes();
+            updateCount();
             announce("Note removed.");
+          } catch {
+            remove.disabled = false;
+            announce("Could not remove the note. Try again.");
           }
         });
 
@@ -493,30 +543,23 @@
 
       function renderSavedNotes() {
         list.querySelectorAll("[data-saved-note]").forEach((item) => item.remove());
-        savedNotes.forEach((note, index) => {
-          const item = renderNote(note, index);
+        savedNotes.forEach((note) => {
+          const item = renderNote(note);
           item.dataset.savedNote = "true";
           list.append(item);
         });
       }
 
-      try {
-        const stored = localStorage.getItem(storageKey);
-        if (stored !== null) {
-          const parsed = JSON.parse(stored);
-          if (!Array.isArray(parsed) || !parsed.every((note) => typeof note === "string")) {
-            throw new TypeError("Saved notes have an unexpected format.");
-          }
-          savedNotes = parsed;
-        }
-      } catch {
-        announce("Saved notes could not be read. New notes can still be added.");
-      }
-
-      renderSavedNotes();
       updateCount();
+      migrateLegacyNotes().then(refreshNotes);
+      setInterval(refreshNotes, 15000);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+          refreshNotes();
+        }
+      });
 
-      form.addEventListener("submit", (event) => {
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const note = input.value.trim();
         if (!note) {
@@ -525,13 +568,15 @@
           return;
         }
 
-        savedNotes.push(note);
-        renderSavedNotes();
-        updateCount();
-        const saved = persistNotes();
-        input.value = "";
-        if (saved) {
+        try {
+          const result = await api("notes", { method: "POST", body: JSON.stringify(note) });
+          savedNotes.push({ id: result.name, text: note });
+          renderSavedNotes();
+          updateCount();
+          input.value = "";
           announce("Added to the constellation.");
+        } catch {
+          announce("Could not save the note. It was not added; try again.");
         }
         input.focus();
       });

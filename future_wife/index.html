@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080910" />
+    <title>A Small Constellation</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f4efff;
+        --muted: #aaa6bc;
+        --quiet: #77748b;
+        --line: rgba(210, 194, 255, 0.16);
+        --panel: rgba(20, 19, 34, 0.78);
+        --violet: #c6a8ff;
+        --rose: #f1b8d4;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        background: #080910;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(ellipse at 50% 0%, rgba(91, 69, 137, 0.2), transparent 47%),
+          radial-gradient(ellipse at 10% 70%, rgba(76, 57, 110, 0.12), transparent 36%),
+          #080910;
+        font-family: Georgia, "Times New Roman", serif;
+        line-height: 1.6;
+      }
+
+      body::before,
+      body::after {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        content: "";
+      }
+
+      body::before {
+        background-image:
+          radial-gradient(1px 1px at 8% 13%, #fff 99%, transparent),
+          radial-gradient(1px 1px at 21% 76%, #dfd4ff 99%, transparent),
+          radial-gradient(1px 1px at 37% 22%, #fff 99%, transparent),
+          radial-gradient(1.5px 1.5px at 49% 88%, #fff 99%, transparent),
+          radial-gradient(1px 1px at 63% 11%, #e1d6ff 99%, transparent),
+          radial-gradient(1px 1px at 74% 58%, #fff 99%, transparent),
+          radial-gradient(1px 1px at 91% 32%, #ded2ff 99%, transparent),
+          radial-gradient(1.5px 1.5px at 88% 83%, #fff 99%, transparent);
+        background-size: 330px 310px;
+        opacity: 0.62;
+      }
+
+      body::after {
+        background: radial-gradient(ellipse at center, transparent 36%, rgba(4, 4, 10, 0.42));
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .page {
+        position: relative;
+        z-index: 1;
+        width: min(760px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 56px 0 72px;
+      }
+
+      .masthead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 74px;
+        color: var(--muted);
+        font: 11px/1.4 "Courier New", monospace;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .back-link {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .back-link:hover,
+      .back-link:focus-visible {
+        color: var(--ink);
+      }
+
+      .edition {
+        color: var(--quiet);
+      }
+
+      .hero {
+        max-width: 650px;
+        margin: 0 auto 42px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        margin: 0 0 18px;
+        color: var(--violet);
+        font: 11px/1.5 "Courier New", monospace;
+        letter-spacing: 0.21em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(42px, 9vw, 72px);
+        font-weight: 400;
+        letter-spacing: -0.055em;
+        line-height: 1.04;
+      }
+
+      .subtitle {
+        max-width: 510px;
+        margin: 22px auto 0;
+        color: var(--muted);
+        font-size: 17px;
+      }
+
+      .note {
+        max-width: 540px;
+        margin: 26px auto 0;
+        padding: 15px 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(13, 13, 23, 0.62);
+        color: #c6c1d3;
+        font-size: 14px;
+      }
+
+      .note strong {
+        color: var(--rose);
+        font-weight: 400;
+      }
+
+      .list-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 48px 0 14px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 400;
+      }
+
+      .count {
+        color: var(--quiet);
+        font: 11px/1.5 "Courier New", monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .observations {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .observation {
+        display: grid;
+        grid-template-columns: 30px 1fr auto;
+        align-items: start;
+        gap: 14px;
+        padding: 17px 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--panel);
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+        animation: arrive 280ms ease-out both;
+      }
+
+      .star {
+        padding-top: 1px;
+        color: var(--violet);
+        font-size: 16px;
+        text-align: center;
+      }
+
+      .observation p {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .remove {
+        padding: 2px 0;
+        border: 0;
+        background: transparent;
+        color: var(--quiet);
+        cursor: pointer;
+        font: 11px/1.5 "Courier New", monospace;
+      }
+
+      .remove:hover,
+      .remove:focus-visible {
+        color: var(--rose);
+      }
+
+      .remove:focus-visible,
+      button:focus-visible,
+      input:focus-visible,
+      a:focus-visible {
+        outline: 2px solid var(--violet);
+        outline-offset: 3px;
+      }
+
+      .add-card {
+        margin-top: 30px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(17, 16, 29, 0.76);
+      }
+
+      .add-card h2 {
+        font-size: 20px;
+      }
+
+      .add-card > p {
+        margin: 5px 0 16px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .add-form {
+        display: flex;
+        gap: 10px;
+      }
+
+      .add-form input {
+        min-width: 0;
+        flex: 1;
+        padding: 12px 14px;
+        border: 1px solid rgba(210, 194, 255, 0.24);
+        border-radius: 8px;
+        background: rgba(5, 5, 12, 0.75);
+        color: var(--ink);
+      }
+
+      .add-form input::placeholder {
+        color: #77748b;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        clip-path: inset(50%);
+      }
+
+      .add-form button {
+        padding: 10px 16px;
+        border: 1px solid rgba(198, 168, 255, 0.48);
+        border-radius: 8px;
+        background: rgba(141, 111, 190, 0.2);
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      .add-form button:hover {
+        background: rgba(141, 111, 190, 0.36);
+      }
+
+      .status {
+        min-height: 22px;
+        margin: 9px 0 0;
+        color: var(--rose);
+        font-size: 13px;
+      }
+
+      .footer {
+        margin-top: 42px;
+        color: var(--quiet);
+        font: 11px/1.7 "Courier New", monospace;
+        letter-spacing: 0.08em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      @keyframes arrive {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @media (max-width: 520px) {
+        .page {
+          padding-top: 28px;
+        }
+
+        .masthead {
+          margin-bottom: 58px;
+        }
+
+        .subtitle {
+          font-size: 16px;
+        }
+
+        .observation {
+          grid-template-columns: 22px 1fr auto;
+          gap: 10px;
+          padding: 15px 12px;
+        }
+
+        .observation p {
+          font-size: 15px;
+        }
+
+        .add-card {
+          padding: 18px 14px;
+        }
+
+        .add-form {
+          align-items: stretch;
+          flex-direction: column;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="masthead">
+        <a class="back-link" href="../">ElevenLLM.dev</a>
+        <span class="edition">Field notes, in progress</span>
+      </header>
+
+      <section class="hero" aria-labelledby="page-title">
+        <p class="subtitle">
+          The little things
+        </p>
+        <p class="note">
+          <strong>A place...</strong>
+          Just a place to remember what I appreciate.
+        </p>
+      </section>
+
+      <section aria-labelledby="list-title">
+        <div class="list-heading">
+          <h2 id="list-title">Things that feel in sync</h2>
+          <span class="count" id="count" aria-live="polite"></span>
+        </div>
+        <ul class="observations" id="observations">
+          <li class="observation">
+            <span class="star" aria-hidden="true">✦</span>
+            <p>We both have J names, and she likes the idea of J names for future kids.</p>
+          </li>
+          <li class="observation">
+            <span class="star" aria-hidden="true">✦</span>
+            <p>We seem to want a similar number of kids, and she especially hopes for a girl.</p>
+          </li>
+          <li class="observation">
+            <span class="star" aria-hidden="true">✦</span>
+            <p>Pisces and Cancer: water signs with a surprisingly easy current between them.</p>
+          </li>
+          <li class="observation">
+            <span class="star" aria-hidden="true">✦</span>
+            <p>We communicate openly and make an effort to understand each other.</p>
+          </li>
+          <li class="observation">
+            <span class="star" aria-hidden="true">✦</span>
+            <p>We know how to compromise without making it feel like keeping score.</p>
+          </li>
+          <li class="observation">
+            <span class="star" aria-hidden="true">✦</span>
+            <p>We haven't had a fight; being around each other feels calm.</p>
+          </li>
+          <li class="observation">
+            <span class="star" aria-hidden="true">✦</span>
+            <p>We hold each other to similar standards and care about the same fundamentals.</p>
+          </li>
+          <li class="observation">
+            <span class="star" aria-hidden="true">✦</span>
+            <p>We see eye to eye on the political issues that matter to us.</p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="add-card" aria-labelledby="add-title">
+        <h2 id="add-title">Add more</h2>
+        <p>Keep a note of a new thing you notice.</p>
+        <form class="add-form" id="add-form">
+          <label for="new-observation" class="sr-only">Something else that feels in sync</label>
+          <input
+            id="new-observation"
+            name="observation"
+            type="text"
+            maxlength="180"
+            placeholder="Something else that feels in sync..."
+            autocomplete="off"
+            required
+          />
+          <button type="submit">Add</button>
+        </form>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <footer class="footer">I will win.</footer>
+    </main>
+
+    <script>
+      const storageKey = "small-constellation-notes";
+      const list = document.querySelector("#observations");
+      const form = document.querySelector("#add-form");
+      const input = document.querySelector("#new-observation");
+      const status = document.querySelector("#status");
+      const count = document.querySelector("#count");
+      let savedNotes = [];
+
+      function announce(message) {
+        status.textContent = message;
+      }
+
+      function updateCount() {
+        const total = list.querySelectorAll(".observation").length;
+        count.textContent = `${total} ${total === 1 ? "star" : "stars"}`;
+      }
+
+      function persistNotes() {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(savedNotes));
+          return true;
+        } catch {
+          announce("Could not save in this browser. The note is still here for this visit.");
+          return false;
+        }
+      }
+
+      function renderNote(note, index) {
+        const item = document.createElement("li");
+        item.className = "observation";
+
+        const star = document.createElement("span");
+        star.className = "star";
+        star.setAttribute("aria-hidden", "true");
+        star.textContent = "✦";
+
+        const text = document.createElement("p");
+        text.textContent = note;
+
+        const remove = document.createElement("button");
+        remove.className = "remove";
+        remove.type = "button";
+        remove.textContent = "Remove";
+        remove.setAttribute("aria-label", `Remove note: ${note}`);
+        remove.addEventListener("click", () => {
+          savedNotes.splice(index, 1);
+          item.remove();
+          const saved = persistNotes();
+          renderSavedNotes();
+          updateCount();
+          if (saved) {
+            announce("Note removed.");
+          }
+        });
+
+        item.append(star, text, remove);
+        return item;
+      }
+
+      function renderSavedNotes() {
+        list.querySelectorAll("[data-saved-note]").forEach((item) => item.remove());
+        savedNotes.forEach((note, index) => {
+          const item = renderNote(note, index);
+          item.dataset.savedNote = "true";
+          list.append(item);
+        });
+      }
+
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored !== null) {
+          const parsed = JSON.parse(stored);
+          if (!Array.isArray(parsed) || !parsed.every((note) => typeof note === "string")) {
+            throw new TypeError("Saved notes have an unexpected format.");
+          }
+          savedNotes = parsed;
+        }
+      } catch {
+        announce("Saved notes could not be read. New notes can still be added.");
+      }
+
+      renderSavedNotes();
+      updateCount();
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const note = input.value.trim();
+        if (!note) {
+          announce("Write a little note before adding it.");
+          input.focus();
+          return;
+        }
+
+        savedNotes.push(note);
+        renderSavedNotes();
+        updateCount();
+        const saved = persistNotes();
+        input.value = "";
+        if (saved) {
+          announce("Added to the constellation.");
+        }
+        input.focus();
+      });
+    </script>
+  </body>
+</html>

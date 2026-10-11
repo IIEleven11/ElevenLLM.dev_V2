@@ -35,49 +35,13 @@
         line-height: 1.6;
       }
 
-      body::before,
-      body::after {
+      #sky {
         position: fixed;
         inset: 0;
         z-index: 0;
+        width: 100%;
+        height: 100%;
         pointer-events: none;
-        content: "";
-      }
-
-      body::before {
-        background-image:
-          radial-gradient(1px 1px at 8% 13%, #fff 99%, transparent),
-          radial-gradient(1px 1px at 37% 22%, #fff 99%, transparent),
-          radial-gradient(1.5px 1.5px at 49% 88%, #fff 99%, transparent),
-          radial-gradient(1px 1px at 74% 58%, #fff 99%, transparent),
-          radial-gradient(1.5px 1.5px at 88% 83%, #fff 99%, transparent);
-        background-size: 330px 310px;
-        animation: twinkle-a 7s ease-in-out infinite;
-      }
-
-      body::after {
-        background-image:
-          radial-gradient(1px 1px at 21% 76%, #dfd4ff 99%, transparent),
-          radial-gradient(1px 1px at 63% 11%, #e1d6ff 99%, transparent),
-          radial-gradient(1px 1px at 91% 32%, #ded2ff 99%, transparent),
-          radial-gradient(1.5px 1.5px at 15% 40%, #fff 99%, transparent),
-          radial-gradient(1px 1px at 56% 47%, #fff 99%, transparent);
-        background-size: 410px 370px;
-        animation: twinkle-b 9s ease-in-out infinite 1.5s;
-      }
-
-      @keyframes twinkle-a {
-        0%, 100% { opacity: 0.25; }
-        35% { opacity: 0.8; }
-        45% { opacity: 0.6; }
-        60% { opacity: 0.9; }
-      }
-
-      @keyframes twinkle-b {
-        0%, 100% { opacity: 0.7; }
-        30% { opacity: 0.2; }
-        55% { opacity: 0.85; }
-        70% { opacity: 0.5; }
       }
 
       button,
@@ -384,6 +348,7 @@
     </style>
   </head>
   <body>
+    <canvas id="sky" aria-hidden="true"></canvas>
     <main class="page">
       <header class="masthead">
         <a class="back-link" href="../">ElevenLLM.dev</a>
@@ -392,7 +357,7 @@
 
       <section class="hero" aria-labelledby="page-title">
         <p class="subtitle">
-          Hi... :(
+          Hi...
         </p>
         <p class="note">
           Just a place to remember.
@@ -463,6 +428,99 @@
     </main>
 
     <script>
+      (() => {
+        const canvas = document.querySelector("#sky");
+        const ctx = canvas.getContext("2d");
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const tints = ["255,255,255", "223,212,255", "225,214,255"];
+        const REACH = 150;
+        let stars = [];
+        let width = 0;
+        let height = 0;
+        const mouse = { x: -9999, y: -9999 };
+
+        function build() {
+          const dpr = window.devicePixelRatio || 1;
+          width = window.innerWidth;
+          height = window.innerHeight;
+          canvas.width = Math.round(width * dpr);
+          canvas.height = Math.round(height * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+          const count = Math.round(Math.min(160, Math.max(60, (width * height) / 9000)));
+          stars = Array.from({ length: count }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            r: Math.random() < 0.2 ? 1.5 : 1,
+            tint: tints[Math.floor(Math.random() * tints.length)],
+            phase: Math.random() * Math.PI * 2,
+            speed: 0.00025 + Math.random() * 0.0004,
+            // Roughly a third of the stars dip to fully invisible.
+            floor: Math.random() < 0.35 ? 0 : 0.2,
+            driftPhase: Math.random() * Math.PI * 2,
+            driftSpeed: 0.00004 + Math.random() * 0.00004,
+            driftSize: 2 + Math.random() * 3,
+            glow: 0,
+          }));
+        }
+
+        function draw(time) {
+          ctx.clearRect(0, 0, width, height);
+          for (const s of stars) {
+            const wave = (Math.sin(time * s.speed + s.phase) + 1) / 2;
+            const base = s.floor + (0.85 - s.floor) * wave * wave;
+            const x = s.x + Math.sin(time * s.driftSpeed + s.driftPhase) * s.driftSize;
+            const y = s.y + Math.cos(time * s.driftSpeed * 0.8 + s.driftPhase) * s.driftSize;
+
+            const dist = Math.hypot(x - mouse.x, y - mouse.y);
+            const target = dist < REACH ? 1 - dist / REACH : 0;
+            s.glow += (target - s.glow) * 0.08;
+
+            const alpha = Math.min(1, base + s.glow * (1 - base) * 1.2);
+            if (alpha < 0.01) {
+              continue;
+            }
+            const radius = s.r + s.glow * 1.1;
+
+            if (s.glow > 0.03) {
+              const halo = ctx.createRadialGradient(x, y, 0, x, y, radius * 6);
+              halo.addColorStop(0, `rgba(${s.tint},${(0.35 * s.glow * alpha).toFixed(3)})`);
+              halo.addColorStop(1, `rgba(${s.tint},0)`);
+              ctx.fillStyle = halo;
+              ctx.fillRect(x - radius * 6, y - radius * 6, radius * 12, radius * 12);
+            }
+            ctx.fillStyle = `rgba(${s.tint},${alpha.toFixed(3)})`;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        function frame(time) {
+          draw(time);
+          if (!reduceMotion.matches) {
+            requestAnimationFrame(frame);
+          }
+        }
+
+        window.addEventListener("pointermove", (event) => {
+          mouse.x = event.clientX;
+          mouse.y = event.clientY;
+        });
+        document.addEventListener("pointerleave", () => {
+          mouse.x = mouse.y = -9999;
+        });
+        window.addEventListener("resize", () => {
+          build();
+          if (reduceMotion.matches) {
+            draw(0);
+          }
+        });
+
+        build();
+        requestAnimationFrame(frame);
+      })();
+
       // Firebase Realtime Database URL, e.g. "https://your-project-default-rtdb.firebaseio.com"
       const databaseURL = "https://wife-176ae-default-rtdb.firebaseio.com/";
       const legacyStorageKey = "small-constellation-notes";

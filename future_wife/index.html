@@ -259,7 +259,13 @@
         letter-spacing: 0.08em;
       }
 
-      .remove {
+      .item-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .item-action {
         padding: 2px 0;
         border: 0;
         background: transparent;
@@ -268,17 +274,26 @@
         font: 11px/1.5 "Courier New", monospace;
       }
 
-      .remove:hover,
-      .remove:focus-visible {
+      .item-action:hover,
+      .item-action:focus-visible {
         color: var(--rose);
       }
 
-      .remove:focus-visible,
+      .item-action:focus-visible,
       button:focus-visible,
       input:focus-visible,
       a:focus-visible {
         outline: 2px solid var(--violet);
         outline-offset: 3px;
+      }
+
+      .observation-edit-input {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid rgba(210, 194, 255, 0.24);
+        border-radius: 6px;
+        background: rgba(5, 5, 12, 0.75);
+        color: var(--ink);
       }
 
       .add-card {
@@ -473,35 +488,35 @@
           <span class="count" id="count" aria-live="polite"></span>
         </div>
         <ul class="observations" id="observations">
-          <li class="observation">
+          <li class="observation" data-default-note="default-1">
             <span class="star" aria-hidden="true">✦</span>
             <p>The whole J name thing.</p>
           </li>
-          <li class="observation">
+          <li class="observation" data-default-note="default-2">
             <span class="star" aria-hidden="true">✦</span>
             <p>Both want a girl</p>
           </li>
-          <li class="observation">
+          <li class="observation" data-default-note="default-3">
             <span class="star" aria-hidden="true">✦</span>
             <p>Pisces and Cancer.</p>
           </li>
-          <li class="observation">
+          <li class="observation" data-default-note="default-4">
             <span class="star" aria-hidden="true">✦</span>
             <p>We communicate like we're the same person.</p>
           </li>
-          <li class="observation">
+          <li class="observation" data-default-note="default-5">
             <span class="star" aria-hidden="true">✦</span>
             <p>We know how to compromise.</p>
           </li>
-          <li class="observation">
+          <li class="observation" data-default-note="default-6">
             <span class="star" aria-hidden="true">✦</span>
             <p>We haven't had a fight; being around each other feels calm.</p>
           </li>
-          <li class="observation">
+          <li class="observation" data-default-note="default-7">
             <span class="star" aria-hidden="true">✦</span>
             <p>We hold each other to similar standards and care about the same fundamentals.</p>
           </li>
-          <li class="observation">
+          <li class="observation" data-default-note="default-8">
             <span class="star" aria-hidden="true">✦</span>
             <p>We see eye to eye on the political.</p>
           </li>
@@ -518,7 +533,7 @@
             name="observation"
             type="text"
             maxlength="180"
-            placeholder="Something else that feels in sync..."
+            placeholder="..."
             autocomplete="off"
             required
           />
@@ -710,6 +725,98 @@
         return { text: "", createdAt: null };
       }
 
+      function renderDefaultActions(item, note) {
+        const actions = document.createElement("div");
+        actions.className = "item-actions";
+
+        const edit = document.createElement("button");
+        edit.className = "item-action";
+        edit.type = "button";
+        edit.textContent = "Edit";
+        edit.setAttribute("aria-label", `Edit note: ${note.text}`);
+        edit.addEventListener("click", () => {
+          beginEditing(item, note, async (text) => {
+            await api(`notes/${note.id}`, {
+              method: "PATCH",
+              body: JSON.stringify({ text }),
+            });
+            note.text = text;
+          }, () => renderDefaultActions(item, note));
+        });
+
+        actions.append(edit);
+        const existingActions = item.querySelector(".item-actions");
+        if (existingActions) {
+          existingActions.replaceWith(actions);
+        } else {
+          item.append(actions);
+        }
+      }
+
+      function beginEditing(item, note, saveNote, renderActions) {
+        const text = item.querySelector("p");
+        const input = document.createElement("input");
+        input.className = "observation-edit-input";
+        input.type = "text";
+        input.maxLength = 180;
+        input.value = note.text;
+        input.setAttribute("aria-label", `Edit note: ${note.text}`);
+        text.replaceWith(input);
+
+        const actions = document.createElement("div");
+        actions.className = "item-actions";
+
+        const save = document.createElement("button");
+        save.className = "item-action";
+        save.type = "button";
+        save.textContent = "Save";
+        save.addEventListener("click", async () => {
+          const updatedText = input.value.trim();
+          if (!updatedText) {
+            announce("A note cannot be empty.");
+            input.focus();
+            return;
+          }
+
+          save.disabled = true;
+          try {
+            await saveNote(updatedText);
+            note.text = updatedText;
+            const updated = document.createElement("p");
+            updated.textContent = updatedText;
+            input.replaceWith(updated);
+            renderActions();
+            announce("Note updated.");
+          } catch {
+            save.disabled = false;
+            announce("Could not update the note. Try again.");
+          }
+        });
+
+        const cancel = document.createElement("button");
+        cancel.className = "item-action";
+        cancel.type = "button";
+        cancel.textContent = "Cancel";
+        cancel.addEventListener("click", () => {
+          const original = document.createElement("p");
+          original.textContent = note.text;
+          input.replaceWith(original);
+          renderActions();
+        });
+
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            save.click();
+          } else if (event.key === "Escape") {
+            cancel.click();
+          }
+        });
+
+        actions.append(save, cancel);
+        item.querySelector(".item-actions")?.replaceWith(actions);
+        input.focus();
+      }
+
       function formatTime(ms) {
         return new Date(ms).toLocaleString(undefined, {
           dateStyle: "medium",
@@ -720,8 +827,20 @@
       async function refreshNotes() {
         try {
           const notes = await fetchNotes();
-          if (JSON.stringify(notes) !== JSON.stringify(savedNotes)) {
-            savedNotes = notes;
+          notes.filter((note) => note.id.startsWith("default-")).forEach((note) => {
+            const item = Array.from(list.querySelectorAll("[data-default-note]"))
+              .find((candidate) => candidate.dataset.defaultNote === note.id);
+            if (item && !item.querySelector(".observation-edit-input")) {
+              item.querySelector("p").textContent = note.text;
+              renderDefaultActions(item, note);
+            }
+          });
+          const customNotes = notes.filter((note) => !note.id.startsWith("default-"));
+          if (
+            JSON.stringify(customNotes) !== JSON.stringify(savedNotes) &&
+            !list.querySelector(".observation-edit-input")
+          ) {
+            savedNotes = customNotes;
             renderSavedNotes();
             updateCount();
           }
@@ -765,8 +884,39 @@
         const text = document.createElement("p");
         text.textContent = note.text;
 
+        const body = document.createElement("div");
+        body.append(text);
+        if (note.createdAt) {
+          const time = document.createElement("time");
+          time.className = "added-at";
+          time.dateTime = new Date(note.createdAt).toISOString();
+          time.textContent = formatTime(note.createdAt);
+          body.append(time);
+        }
+
+        const actions = document.createElement("div");
+        actions.className = "item-actions";
+
+        const edit = document.createElement("button");
+        edit.className = "item-action";
+        edit.type = "button";
+        edit.textContent = "Edit";
+        edit.setAttribute("aria-label", `Edit note: ${note.text}`);
+        edit.addEventListener("click", () => {
+          beginEditing(item, note, async (updatedText) => {
+            await api(`notes/${note.id}`, {
+              method: "PATCH",
+              body: JSON.stringify({ text: updatedText }),
+            });
+            const index = savedNotes.findIndex((saved) => saved.id === note.id);
+            if (index !== -1) {
+              savedNotes[index] = { ...note, text: updatedText };
+            }
+          }, () => renderSavedNotes());
+        });
+
         const remove = document.createElement("button");
-        remove.className = "remove";
+        remove.className = "item-action";
         remove.type = "button";
         remove.textContent = "Remove";
         remove.setAttribute("aria-label", `Remove note: ${note.text}`);
@@ -784,17 +934,8 @@
           }
         });
 
-        const body = document.createElement("div");
-        body.append(text);
-        if (note.createdAt) {
-          const time = document.createElement("time");
-          time.className = "added-at";
-          time.dateTime = new Date(note.createdAt).toISOString();
-          time.textContent = formatTime(note.createdAt);
-          body.append(time);
-        }
-
-        item.append(star, body, remove);
+        actions.append(edit, remove);
+        item.append(star, body, actions);
         return item;
       }
 
@@ -806,6 +947,13 @@
           list.append(item);
         });
       }
+
+      Array.from(list.querySelectorAll("[data-default-note]")).forEach((item) => {
+        renderDefaultActions(item, {
+          id: item.dataset.defaultNote,
+          text: item.querySelector("p").textContent,
+        });
+      });
 
       updateCount();
       migrateLegacyNotes().then(refreshNotes);
@@ -835,7 +983,7 @@
           renderSavedNotes();
           updateCount();
           input.value = "";
-          announce("Added to the constellation.");
+          announce("Added to the list.");
         } catch {
           announce("Could not save the note. It was not added; try again.");
         }

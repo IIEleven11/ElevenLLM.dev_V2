@@ -376,6 +376,153 @@
         text-transform: uppercase;
       }
 
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin: 0 0 8px;
+        padding: 4px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(13, 13, 23, 0.62);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 9px 12px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font: 11px/1.5 "Courier New", monospace;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .tab[aria-selected="true"] {
+        background: rgba(141, 111, 190, 0.28);
+        color: var(--ink);
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .calendar-card {
+        margin-top: 36px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel);
+      }
+
+      .cal-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .cal-nav h2 {
+        font-size: 22px;
+      }
+
+      .cal-nav-buttons {
+        display: flex;
+        gap: 6px;
+      }
+
+      .cal-btn {
+        padding: 5px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(5, 5, 12, 0.5);
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      .cal-btn:hover {
+        background: rgba(141, 111, 190, 0.3);
+      }
+
+      .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 4px;
+      }
+
+      .cal-dow {
+        padding-bottom: 4px;
+        color: var(--quiet);
+        font: 10px/1.4 "Courier New", monospace;
+        letter-spacing: 0.1em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .cal-day {
+        position: relative;
+        aspect-ratio: 1;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: rgba(5, 5, 12, 0.4);
+        color: var(--ink);
+        cursor: pointer;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .cal-day:hover {
+        border-color: var(--line);
+      }
+
+      .cal-day.today {
+        border-color: rgba(198, 168, 255, 0.5);
+      }
+
+      .cal-day.selected {
+        background: rgba(141, 111, 190, 0.38);
+        border-color: var(--violet);
+      }
+
+      .cal-day.has-event::after {
+        content: "✦";
+        position: absolute;
+        right: 5px;
+        bottom: 2px;
+        color: #b9a923;
+        font-size: 16px;
+      }
+
+      .cal-blank {
+        aspect-ratio: 1;
+      }
+
+      .cal-selected-date {
+        margin: 22px 0 10px;
+        color: var(--rose);
+        font: 12px/1.5 "Courier New", monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .cal-empty {
+        margin: 0 0 14px;
+        color: var(--quiet);
+        font-size: 14px;
+      }
+
+      .cal-events {
+        margin-bottom: 16px;
+      }
+
+      @media (max-width: 520px) {
+        .calendar-card {
+          padding: 18px 12px;
+        }
+      }
+
       @keyframes arrive {
         from { opacity: 0; transform: translateY(5px); }
         to { opacity: 1; transform: translateY(0); }
@@ -485,6 +632,12 @@
         <p class="countdown-message" id="countdown-message" hidden></p>
       </section>
 
+      <div class="tabs" role="tablist" aria-label="Layers">
+        <button class="tab" id="tab-reasons" role="tab" type="button" aria-selected="true" aria-controls="view-reasons">Reasons</button>
+        <button class="tab" id="tab-calendar" role="tab" type="button" aria-selected="false" aria-controls="view-calendar">Calendar</button>
+      </div>
+
+      <div id="view-reasons" role="tabpanel" aria-labelledby="tab-reasons">
       <section aria-labelledby="list-title">
         <div class="list-heading">
           <h2 id="list-title">Reasons:</h2>
@@ -544,6 +697,30 @@
         </form>
         <p class="status" id="status" role="status" aria-live="polite"></p>
       </section>
+
+      </div>
+
+      <div id="view-calendar" role="tabpanel" aria-labelledby="tab-calendar" hidden>
+        <section class="calendar-card" aria-labelledby="cal-title">
+          <div class="cal-nav">
+            <h2 id="cal-title"></h2>
+            <div class="cal-nav-buttons">
+              <button class="cal-btn" id="cal-prev" type="button" aria-label="Previous month">‹</button>
+              <button class="cal-btn" id="cal-today" type="button">Month</button>
+              <button class="cal-btn" id="cal-next" type="button" aria-label="Next month">›</button>
+            </div>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <p class="cal-selected-date" id="cal-selected-date"></p>
+          <ul class="observations cal-events" id="cal-events"></ul>
+          <form class="add-form" id="cal-form">
+            <label for="cal-input" class="sr-only">Something significant that happened on this day</label>
+            <input id="cal-input" type="text" maxlength="180" placeholder="What happened on this day?" autocomplete="off" required />
+            <button type="submit">Add</button>
+          </form>
+          <p class="status" id="cal-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
 
       <footer class="footer">I will win.</footer>
     </main>
@@ -992,6 +1169,213 @@
         }
         input.focus();
       });
+
+      // Calendar layer: shared events stored under /events in the same database.
+      (() => {
+        const grid = document.querySelector("#cal-grid");
+        const title = document.querySelector("#cal-title");
+        const selectedLabel = document.querySelector("#cal-selected-date");
+        const eventList = document.querySelector("#cal-events");
+        const calForm = document.querySelector("#cal-form");
+        const calInput = document.querySelector("#cal-input");
+        const calStatus = document.querySelector("#cal-status");
+        const tabReasons = document.querySelector("#tab-reasons");
+        const tabCalendar = document.querySelector("#tab-calendar");
+        const viewReasons = document.querySelector("#view-reasons");
+        const viewCalendar = document.querySelector("#view-calendar");
+
+        const pad = (n) => String(n).padStart(2, "0");
+        const keyOf = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
+        const now = new Date();
+        let viewYear = now.getFullYear();
+        let viewMonth = now.getMonth();
+        let selected = keyOf(now.getFullYear(), now.getMonth(), now.getDate());
+        let events = [];
+
+        function say(message) {
+          calStatus.textContent = message;
+        }
+
+        function showTab(name) {
+          const cal = name === "calendar";
+          viewCalendar.hidden = !cal;
+          viewReasons.hidden = cal;
+          tabCalendar.setAttribute("aria-selected", String(cal));
+          tabReasons.setAttribute("aria-selected", String(!cal));
+          if (cal) {
+            loadEvents();
+          }
+        }
+        tabReasons.addEventListener("click", () => showTab("reasons"));
+        tabCalendar.addEventListener("click", () => showTab("calendar"));
+
+        async function loadEvents() {
+          try {
+            const data = await api("events");
+            events = Object.keys(data || {})
+              .sort()
+              .map((id) => ({ id, ...data[id] }))
+              .filter((e) => typeof e.text === "string" && /^\d{4}-\d{2}-\d{2}$/.test(e.date));
+            if (!eventList.querySelector(".observation-edit-input")) {
+              render();
+            }
+          } catch {
+            say("Could not reach the shared calendar. Check your connection.");
+          }
+        }
+
+        function renderGrid() {
+          grid.replaceChildren();
+          title.textContent = new Date(viewYear, viewMonth, 1).toLocaleDateString(undefined, {
+            month: "long",
+            year: "numeric",
+          });
+          ["S", "M", "T", "W", "T", "F", "S"].forEach((d) => {
+            const el = document.createElement("div");
+            el.className = "cal-dow";
+            el.textContent = d;
+            grid.append(el);
+          });
+          const first = new Date(viewYear, viewMonth, 1).getDay();
+          const days = new Date(viewYear, viewMonth + 1, 0).getDate();
+          for (let i = 0; i < first; i++) {
+            const blank = document.createElement("div");
+            blank.className = "cal-blank";
+            grid.append(blank);
+          }
+          const todayKey = keyOf(now.getFullYear(), now.getMonth(), now.getDate());
+          for (let d = 1; d <= days; d++) {
+            const key = keyOf(viewYear, viewMonth, d);
+            const count = events.filter((e) => e.date === key).length;
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "cal-day";
+            if (key === todayKey) btn.classList.add("today");
+            if (key === selected) btn.classList.add("selected");
+            if (count) btn.classList.add("has-event");
+            btn.textContent = d;
+            btn.setAttribute(
+              "aria-label",
+              `${key}${count ? `, ${count} ${count === 1 ? "event" : "events"}` : ""}`
+            );
+            btn.addEventListener("click", () => {
+              selected = key;
+              render();
+              calInput.focus();
+            });
+            grid.append(btn);
+          }
+        }
+
+        function renderEvents() {
+          const [y, m, d] = selected.split("-").map(Number);
+          selectedLabel.textContent = new Date(y, m - 1, d).toLocaleDateString(undefined, {
+            dateStyle: "full",
+          });
+          eventList.replaceChildren();
+          const todays = events.filter((e) => e.date === selected);
+          if (!todays.length) {
+            const empty = document.createElement("li");
+            empty.className = "cal-empty";
+            empty.textContent = "Nothing recorded for this day yet.";
+            eventList.append(empty);
+          }
+          todays.forEach((ev) => eventList.append(renderEvent(ev)));
+        }
+
+        function renderEvent(ev) {
+          const item = document.createElement("li");
+          item.className = "observation";
+          const star = document.createElement("span");
+          star.className = "star";
+          star.setAttribute("aria-hidden", "true");
+          star.textContent = "✦";
+          const text = document.createElement("p");
+          text.textContent = ev.text;
+
+          const actions = document.createElement("div");
+          actions.className = "item-actions";
+          const edit = document.createElement("button");
+          edit.className = "item-action";
+          edit.type = "button";
+          edit.textContent = "Edit";
+          edit.addEventListener("click", () => {
+            beginEditing(item, ev, async (updatedText) => {
+              await api(`events/${ev.id}`, {
+                method: "PATCH",
+                body: JSON.stringify({ text: updatedText }),
+              });
+            }, () => render());
+          });
+          const remove = document.createElement("button");
+          remove.className = "item-action";
+          remove.type = "button";
+          remove.textContent = "Remove";
+          remove.addEventListener("click", async () => {
+            remove.disabled = true;
+            try {
+              await api(`events/${ev.id}`, { method: "DELETE" });
+              events = events.filter((e) => e.id !== ev.id);
+              render();
+              say("Event removed.");
+            } catch {
+              remove.disabled = false;
+              say("Could not remove the event. Try again.");
+            }
+          });
+          actions.append(edit, remove);
+          item.append(star, text, actions);
+          return item;
+        }
+
+        function render() {
+          renderGrid();
+          renderEvents();
+        }
+
+        function shiftMonth(delta) {
+          const d = new Date(viewYear, viewMonth + delta, 1);
+          viewYear = d.getFullYear();
+          viewMonth = d.getMonth();
+          renderGrid();
+        }
+        document.querySelector("#cal-prev").addEventListener("click", () => shiftMonth(-1));
+        document.querySelector("#cal-next").addEventListener("click", () => shiftMonth(1));
+        document.querySelector("#cal-today").addEventListener("click", () => {
+          viewYear = now.getFullYear();
+          viewMonth = now.getMonth();
+          selected = keyOf(now.getFullYear(), now.getMonth(), now.getDate());
+          render();
+        });
+
+        calForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const text = calInput.value.trim();
+          if (!text) {
+            say("Write what happened before adding it.");
+            return;
+          }
+          try {
+            const result = await api("events", {
+              method: "POST",
+              body: JSON.stringify({ date: selected, text, createdAt: { ".sv": "timestamp" } }),
+            });
+            const created = await api(`events/${result.name}`);
+            events.push({ id: result.name, ...created });
+            calInput.value = "";
+            render();
+            say("Added to the calendar.");
+          } catch {
+            say("Could not save the event. It was not added; try again.");
+          }
+          calInput.focus();
+        });
+
+        setInterval(() => {
+          if (!viewCalendar.hidden && !document.hidden) loadEvents();
+        }, 15000);
+        render();
+      })();
     </script>
   </body>
 </html>

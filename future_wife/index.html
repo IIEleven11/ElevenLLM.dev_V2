@@ -635,6 +635,7 @@
       <div class="tabs" role="tablist" aria-label="Layers">
         <button class="tab" id="tab-reasons" role="tab" type="button" aria-selected="true" aria-controls="view-reasons">Reasons</button>
         <button class="tab" id="tab-calendar" role="tab" type="button" aria-selected="false" aria-controls="view-calendar">Calendar</button>
+        <button class="tab" id="tab-adored" role="tab" type="button" aria-selected="false" aria-controls="view-adored">Things Adored</button>
       </div>
 
       <div id="view-reasons" role="tabpanel" aria-labelledby="tab-reasons">
@@ -719,6 +720,24 @@
             <button type="submit">Add</button>
           </form>
           <p class="status" id="cal-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <div id="view-adored" role="tabpanel" aria-labelledby="tab-adored" hidden>
+        <section aria-labelledby="adored-title">
+          <div class="list-heading">
+            <h2 id="adored-title">Things adored:</h2>
+          </div>
+          <ul class="observations" id="adored-list"></ul>
+        </section>
+        <section class="add-card" aria-labelledby="adored-add-title">
+          <h2 id="adored-add-title">Add more</h2>
+          <form class="add-form" id="adored-form">
+            <label for="adored-input" class="sr-only">Something adored</label>
+            <input id="adored-input" type="text" maxlength="180" placeholder="..." autocomplete="off" required />
+            <button type="submit">Add</button>
+          </form>
+          <p class="status" id="adored-status" role="status" aria-live="polite"></p>
         </section>
       </div>
 
@@ -1196,18 +1215,130 @@
           calStatus.textContent = message;
         }
 
+        const tabAdored = document.querySelector("#tab-adored");
+        const viewAdored = document.querySelector("#view-adored");
+
         function showTab(name) {
-          const cal = name === "calendar";
-          viewCalendar.hidden = !cal;
-          viewReasons.hidden = cal;
-          tabCalendar.setAttribute("aria-selected", String(cal));
-          tabReasons.setAttribute("aria-selected", String(!cal));
-          if (cal) {
+          const views = { reasons: [tabReasons, viewReasons], calendar: [tabCalendar, viewCalendar], adored: [tabAdored, viewAdored] };
+          for (const [key, [tab, view]] of Object.entries(views)) {
+            view.hidden = key !== name;
+            tab.setAttribute("aria-selected", String(key === name));
+          }
+          if (name === "calendar") {
             loadEvents();
+          } else if (name === "adored") {
+            loadAdored();
           }
         }
         tabReasons.addEventListener("click", () => showTab("reasons"));
         tabCalendar.addEventListener("click", () => showTab("calendar"));
+        tabAdored.addEventListener("click", () => showTab("adored"));
+
+        // Things adored layer: shared list under /adored, seeded once via /adored_seeded.
+        const adoredList = document.querySelector("#adored-list");
+        const adoredForm = document.querySelector("#adored-form");
+        const adoredInput = document.querySelector("#adored-input");
+        const adoredStatus = document.querySelector("#adored-status");
+        let adored = [];
+
+        function adoredSay(message) {
+          adoredStatus.textContent = message;
+        }
+
+        async function loadAdored() {
+          try {
+            if (!(await api("adored_seeded"))) {
+              await api("adored_seeded", { method: "PUT", body: "true" });
+              await api("adored", {
+                method: "POST",
+                body: JSON.stringify({ text: "her hips and tummy", createdAt: { ".sv": "timestamp" } }),
+              });
+            }
+            const data = await api("adored");
+            adored = Object.keys(data || {})
+              .sort()
+              .map((id) => ({ id, ...data[id] }))
+              .filter((a) => typeof a.text === "string");
+            if (!adoredList.querySelector(".observation-edit-input")) {
+              renderAdored();
+            }
+          } catch {
+            adoredSay("Could not reach the shared list. Check your connection.");
+          }
+        }
+
+        function renderAdored() {
+          adoredList.replaceChildren();
+          adored.forEach((entry) => {
+            const item = document.createElement("li");
+            item.className = "observation";
+            const star = document.createElement("span");
+            star.className = "star";
+            star.setAttribute("aria-hidden", "true");
+            star.textContent = "✦";
+            const text = document.createElement("p");
+            text.textContent = entry.text;
+            const actions = document.createElement("div");
+            actions.className = "item-actions";
+            const edit = document.createElement("button");
+            edit.className = "item-action";
+            edit.type = "button";
+            edit.textContent = "Edit";
+            edit.addEventListener("click", () => {
+              beginEditing(item, entry, async (updatedText) => {
+                await api(`adored/${entry.id}`, {
+                  method: "PATCH",
+                  body: JSON.stringify({ text: updatedText }),
+                });
+              }, () => renderAdored());
+            });
+            const remove = document.createElement("button");
+            remove.className = "item-action";
+            remove.type = "button";
+            remove.textContent = "Remove";
+            remove.addEventListener("click", async () => {
+              remove.disabled = true;
+              try {
+                await api(`adored/${entry.id}`, { method: "DELETE" });
+                adored = adored.filter((a) => a.id !== entry.id);
+                renderAdored();
+                adoredSay("Removed.");
+              } catch {
+                remove.disabled = false;
+                adoredSay("Could not remove it. Try again.");
+              }
+            });
+            actions.append(edit, remove);
+            item.append(star, text, actions);
+            adoredList.append(item);
+          });
+        }
+
+        adoredForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const text = adoredInput.value.trim();
+          if (!text) {
+            return;
+          }
+          try {
+            const result = await api("adored", {
+              method: "POST",
+              body: JSON.stringify({ text, createdAt: { ".sv": "timestamp" } }),
+            });
+            const created = await api(`adored/${result.name}`);
+            adored.push({ id: result.name, ...created });
+            adoredInput.value = "";
+            renderAdored();
+            adoredSay("Added.");
+          } catch {
+            adoredSay("Could not save it. Try again.");
+          }
+          adoredInput.focus();
+        });
+
+        setInterval(() => {
+          if (!viewAdored.hidden && !document.hidden) loadAdored();
+        }, 15000);
 
         async function loadEvents() {
           try {

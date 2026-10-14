@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Little Question 💕</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #ffd6e7, #ffb3d1 50%, #e0c3fc); font-family: "Comic Sans MS", "Segoe UI", sans-serif;
+    overflow: hidden; touch-action: manipulation;
+  }
+  .sign {
+    position: relative; background: #fff8fb; border: 6px solid #ff7eb3; border-radius: 28px;
+    padding: 40px 36px 32px; width: min(92vw, 420px); text-align: center;
+    box-shadow: 0 12px 0 #e75a98, 0 20px 40px rgba(0,0,0,.2); animation: sway 3s ease-in-out infinite; transform-origin: top center;
+  }
+  .sign::before, .sign::after {
+    content: ""; position: absolute; top: -34px; width: 4px; height: 34px; background: #b07a5a;
+  }
+  .sign::before { left: 22%; } .sign::after { right: 22%; }
+  @keyframes sway { 0%,100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
+  h1 { margin: 0 0 6px; color: #e75a98; font-size: 2rem; }
+  .emoji { font-size: 2.6rem; }
+  .options { display: flex; justify-content: center; gap: 28px; margin-top: 24px; min-height: 52px; }
+  label { display: flex; align-items: center; gap: 8px; font-size: 1.4rem; color: #8a3b61; cursor: pointer; user-select: none; }
+  input[type=checkbox] { width: 28px; height: 28px; accent-color: #ff4f9a; cursor: pointer; }
+  #noLabel.dodging { position: fixed; z-index: 10; transition: left .2s, top .2s; }
+  #msg { margin-top: 20px; color: #8a3b61; min-height: 1.4em; }
+  .heart { position: fixed; bottom: -40px; animation: rise 4s linear forwards; pointer-events: none; }
+  @keyframes rise { to { transform: translateY(-110vh); opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="sign" id="sign">
+  <div class="emoji">🌸</div>
+  <h1>Will you be my girlfriend?</h1>
+  <div class="options">
+    <label><input type="checkbox" id="yes"> Yes 💖</label>
+    <label id="noLabel"><input type="checkbox" id="no"> No</label>
+  </div>
+  <div id="msg"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  // Fill these in from your EmailJS dashboard.
+  const EMAILJS_PUBLIC_KEY = "SlGKatEOamjcjvKcu";
+  const EMAILJS_SERVICE_ID = "service_sttktx6";
+  const EMAILJS_TEMPLATE_ID = "template_tam0sst";
+
+  const yes = document.getElementById("yes");
+  const no = document.getElementById("no");
+  const noLabel = document.getElementById("noLabel");
+  const msg = document.getElementById("msg");
+  const placeholder = document.createElement("span");
+  let sent = false;
+
+  function dodge() {
+    if (!noLabel.classList.contains("dodging")) {
+      const r = noLabel.getBoundingClientRect();
+      placeholder.style.cssText = `display:inline-block;width:${r.width}px;height:${r.height}px`;
+      noLabel.parentNode.insertBefore(placeholder, noLabel);
+      noLabel.classList.add("dodging");
+    }
+    const w = noLabel.offsetWidth, h = noLabel.offsetHeight, pad = 10;
+    const maxX = window.innerWidth - w - pad, maxY = window.innerHeight - h - pad;
+    const cur = noLabel.getBoundingClientRect();
+    let x, y, tries = 0;
+    do {
+      x = pad + Math.random() * Math.max(0, maxX - pad);
+      y = pad + Math.random() * Math.max(0, maxY - pad);
+      tries++;
+    } while (tries < 20 && Math.hypot(x - cur.left, y - cur.top) < 150);
+    noLabel.style.left = x + "px";
+    noLabel.style.top = y + "px";
+    no.checked = false;
+  }
+
+  // Desktop: dodge when the cursor gets close.
+  document.addEventListener("mousemove", (e) => {
+    const r = noLabel.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    if (Math.hypot(e.clientX - cx, e.clientY - cy) < 110) dodge();
+  });
+  // Phone: dodge on touch / click before it can register.
+  ["touchstart", "pointerdown", "mousedown", "click"].forEach((ev) =>
+    noLabel.addEventListener(ev, (e) => { e.preventDefault(); dodge(); }, { passive: false })
+  );
+  no.addEventListener("change", dodge);
+  no.addEventListener("focus", dodge);
+
+  yes.addEventListener("change", async () => {
+    if (!yes.checked || sent) return;
+    sent = true;
+    yes.disabled = true;
+    msg.textContent = "Yay!! 💕 Telling him...";
+    for (let i = 0; i < 25; i++) {
+      const h = document.createElement("div");
+      h.className = "heart"; h.textContent = "💖";
+      h.style.left = Math.random() * 100 + "vw";
+      h.style.fontSize = 20 + Math.random() * 30 + "px";
+      h.style.animationDelay = Math.random() * 1.5 + "s";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 6000);
+    }
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        message: "She said YES! 💖 Will you be my girlfriend? — YES",
+        time: new Date().toLocaleString(),
+      }, { publicKey: EMAILJS_PUBLIC_KEY });
+      msg.textContent = "He knows now. I'm so happy! 🥰";
+    } catch (err) {
+      console.error(err);
+      msg.textContent = "Yay! 💖 (The email didn't send, so please tell him yourself!)";
+    }
+  });
+</script>
+</body>
+</html>

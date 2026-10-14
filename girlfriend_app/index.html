@@ -107,7 +107,7 @@
     }
     try {
       await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        message: "She said YES! 💖 Will you be my girlfriend? — YES",
+        message: "She said YES! 💖 Jessica, will you be my girlfriend? — YES",
         time: new Date().toLocaleString(),
       }, { publicKey: EMAILJS_PUBLIC_KEY });
       msg.textContent = "He knows now. I'm so happy! 🥰";

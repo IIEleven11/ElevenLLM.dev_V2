@@ -609,7 +609,7 @@
       <section class="countdown-card" aria-labelledby="countdown-heading">
         <h2 class="countdown-heading" id="countdown-heading">D-Day</h2>
         <p class="countdown-date">
-          <time datetime="2026-12-26">December 26, 2026</time>
+          <time datetime="2026-10-21T12:00">Wednesday, October 21, 2026 at noon</time>
         </p>
         <div class="countdown" id="countdown" role="timer" aria-label="Time remaining until D-Day">
           <div class="countdown-unit">
@@ -846,7 +846,7 @@
       };
       const countdown = document.querySelector("#countdown");
       const countdownMessage = document.querySelector("#countdown-message");
-      const dDay = new Date(2026, 11, 26);
+      const dDay = new Date(2026, 9, 21, 12);
 
       function updateCountdown() {
         const remaining = dDay.getTime() - Date.now();

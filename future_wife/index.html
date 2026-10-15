@@ -578,6 +578,94 @@
         }
       }
 
+      body.locked .add-card,
+      body.locked .add-form,
+      body.locked .item-actions {
+        display: none !important;
+      }
+
+      .lock-toggle {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--muted);
+        font: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+        cursor: pointer;
+      }
+
+      .lock-toggle:hover,
+      .lock-toggle:focus-visible {
+        color: var(--ink);
+      }
+
+      .gate {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(0, 0, 0, 0.88);
+      }
+
+      .gate[hidden] {
+        display: none;
+      }
+
+      .gate-card {
+        width: min(420px, 100%);
+        padding: 28px 24px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--panel);
+        text-align: center;
+      }
+
+      .gate-card h2 {
+        margin-bottom: 6px;
+      }
+
+      .gate-card p {
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .gate-card input {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(5, 5, 12, 0.6);
+        color: var(--ink);
+      }
+
+      .gate-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .gate-actions button {
+        flex: 1;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(198, 168, 255, 0.16);
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      .gate-error {
+        min-height: 1.4em;
+        margin: 10px 0 0 !important;
+        color: var(--rose) !important;
+        font-size: 13px !important;
+      }
+
       @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
@@ -591,10 +679,24 @@
   </head>
   <body>
     <canvas id="sky" aria-hidden="true"></canvas>
+    <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" hidden>
+      <form class="gate-card" id="gate-form">
+        <h2 id="gate-title">Welcome</h2>
+        <p>Enter the password to make changes, or just look around.</p>
+        <label for="gate-password" class="sr-only">Password</label>
+        <input id="gate-password" type="password" autocomplete="current-password" placeholder="Password" />
+        <p class="gate-error" id="gate-error" role="alert"></p>
+        <div class="gate-actions">
+          <button type="submit">Enter</button>
+          <button type="button" id="gate-skip">Just look around</button>
+        </div>
+      </form>
+    </div>
     <main class="page">
       <header class="masthead">
         <a class="back-link" href="../">ElevenLLM.dev</a>
         <span class="edition">Field notes, in progress</span>
+        <button class="lock-toggle" id="lock-toggle" type="button">Unlock</button>
       </header>
 
       <section class="hero" aria-labelledby="page-title">
@@ -868,6 +970,65 @@
       const countdownInterval = setInterval(updateCountdown, 1000);
       updateCountdown();
 
+      // SHA-256 of the password. To change it: printf '%s' 'newpassword' | sha256sum
+      const PASSWORD_HASH = "cbcc9524dc76128fba1829ca3984d53177598e63842810f32feb2faa3fa7179e";
+      const unlockKey = "future-wife-unlocked";
+      let unlocked = localStorage.getItem(unlockKey) === PASSWORD_HASH;
+      const gate = document.querySelector("#gate");
+      const gateForm = document.querySelector("#gate-form");
+      const gatePassword = document.querySelector("#gate-password");
+      const gateError = document.querySelector("#gate-error");
+      const lockToggle = document.querySelector("#lock-toggle");
+
+      async function sha256(text) {
+        const bytes = new TextEncoder().encode(text);
+        const digest = await crypto.subtle.digest("SHA-256", bytes);
+        return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
+      }
+
+      function applyLockState() {
+        document.body.classList.toggle("locked", !unlocked);
+        lockToggle.textContent = unlocked ? "Lock" : "Unlock";
+      }
+
+      function showGate() {
+        gateError.textContent = "";
+        gatePassword.value = "";
+        gate.hidden = false;
+        gatePassword.focus();
+      }
+
+      gateForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if ((await sha256(gatePassword.value)) === PASSWORD_HASH) {
+          unlocked = true;
+          localStorage.setItem(unlockKey, PASSWORD_HASH);
+          gate.hidden = true;
+          applyLockState();
+        } else {
+          gateError.textContent = "That's not it.";
+        }
+      });
+
+      document.querySelector("#gate-skip").addEventListener("click", () => {
+        gate.hidden = true;
+      });
+
+      lockToggle.addEventListener("click", () => {
+        if (unlocked) {
+          unlocked = false;
+          localStorage.removeItem(unlockKey);
+          applyLockState();
+        } else {
+          showGate();
+        }
+      });
+
+      applyLockState();
+      if (!unlocked) {
+        showGate();
+      }
+
       // Firebase Realtime Database URL, e.g. "https://your-project-default-rtdb.firebaseio.com"
       const databaseURL = "https://wife-176ae-default-rtdb.firebaseio.com/";
       const legacyStorageKey = "small-constellation-notes";
@@ -890,6 +1051,9 @@
       async function api(path, options) {
         if (!databaseURL) {
           throw new Error("Database URL is not configured.");
+        }
+        if (!unlocked && options && options.method && options.method !== "GET") {
+          throw new Error("Locked: view only.");
         }
         const response = await fetch(`${databaseURL.replace(/\/$/, "")}/${path}.json`, options);
         if (!response.ok) {

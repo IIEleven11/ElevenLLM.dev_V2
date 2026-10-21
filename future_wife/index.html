@@ -376,6 +376,257 @@
         text-transform: uppercase;
       }
 
+      body.story-active {
+        overflow: hidden;
+      }
+
+      .story-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: grid;
+        place-items: center;
+        overflow-y: auto;
+        padding: 20px;
+        background: rgba(5, 4, 12, 0.94);
+        backdrop-filter: blur(10px);
+      }
+
+      .story-card {
+        position: relative;
+        z-index: 2;
+        width: min(680px, 100%);
+        padding: clamp(24px, 6vw, 48px);
+        border: 1px solid rgba(210, 194, 255, 0.24);
+        border-radius: 20px;
+        background:
+          radial-gradient(ellipse at top, rgba(141, 111, 190, 0.2), transparent 60%),
+          rgba(17, 16, 29, 0.96);
+        box-shadow: 0 24px 100px rgba(0, 0, 0, 0.48);
+        text-align: center;
+      }
+
+      .story-card.question-stage {
+        width: min(520px, calc(100% - 32px));
+      }
+
+      .memory-constellation {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      .memory-spark {
+        position: absolute;
+        display: -webkit-box;
+        overflow: hidden;
+        padding: 5px 8px;
+        border: 1px solid rgba(210, 194, 255, 0.16);
+        border-radius: 9px;
+        background: rgba(17, 16, 29, 0.58);
+        color: rgba(244, 239, 255, 0.78);
+        font-size: 11px;
+        line-height: 1.25;
+        text-align: center;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        animation: memory-drift 4s ease-in-out infinite alternate;
+      }
+
+      @keyframes memory-drift {
+        from { opacity: 0.52; transform: translate(-50%, -50%) translateY(-4px); }
+        to { opacity: 0.86; transform: translate(-50%, -50%) translateY(4px); }
+      }
+
+      .story-close {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        padding: 6px 9px;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font: 11px/1.5 "Courier New", monospace;
+      }
+
+      .story-close:hover,
+      .story-close:focus-visible {
+        color: var(--ink);
+      }
+
+      .story-preview-note {
+        margin: 14px 0 0;
+        color: var(--rose);
+        font: 11px/1.5 "Courier New", monospace;
+        letter-spacing: 0.08em;
+      }
+
+      .preview-button {
+        margin-top: 14px;
+      }
+
+      .story-card::before,
+      .story-card::after {
+        position: absolute;
+        color: var(--rose);
+        content: "✦";
+        opacity: 0.7;
+        animation: twinkle 2.4s ease-in-out infinite alternate;
+      }
+
+      .story-card::before {
+        top: 20px;
+        left: 24px;
+      }
+
+      .story-card::after {
+        right: 26px;
+        bottom: 22px;
+        color: var(--violet);
+        animation-delay: 0.7s;
+      }
+
+      .story-title {
+        margin: 0;
+        font-size: clamp(28px, 6vw, 42px);
+        font-weight: 400;
+        letter-spacing: -0.04em;
+      }
+
+      .story-progress {
+        min-height: 1.5em;
+        margin: 12px 0 0;
+        color: var(--quiet);
+        font: 11px/1.5 "Courier New", monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .story-moment {
+        display: grid;
+        min-height: 190px;
+        align-content: center;
+        margin: 10px 0 14px;
+      }
+
+      .story-moment.arrive {
+        animation: story-arrive 0.65s ease both;
+      }
+
+      .story-category {
+        margin: 0 0 12px;
+        color: var(--violet);
+        font: 11px/1.5 "Courier New", monospace;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .story-text {
+        max-width: 540px;
+        margin: 0 auto;
+        color: var(--ink);
+        font-size: clamp(20px, 4vw, 30px);
+        line-height: 1.4;
+      }
+
+      .story-detail {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font: 12px/1.5 "Courier New", monospace;
+      }
+
+      .story-action,
+      .answer-choice {
+        border: 1px solid rgba(198, 168, 255, 0.36);
+        border-radius: 999px;
+        background: rgba(141, 111, 190, 0.16);
+        color: var(--ink);
+      }
+
+      .story-action {
+        padding: 9px 16px;
+        cursor: pointer;
+        font: 11px/1.5 "Courier New", monospace;
+        letter-spacing: 0.08em;
+      }
+
+      .story-action:hover,
+      .story-action:focus-visible {
+        background: rgba(141, 111, 190, 0.32);
+      }
+
+      .proposal-question {
+        margin-top: 12px;
+        animation: story-arrive 0.8s ease both;
+      }
+
+      .proposal-question h3 {
+        margin: 0;
+        color: var(--rose);
+        font-size: clamp(36px, 8vw, 56px);
+        font-weight: 400;
+        letter-spacing: -0.05em;
+      }
+
+      .proposal-question > p {
+        margin: 8px 0 22px;
+        color: var(--muted);
+      }
+
+      .answer-options {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        min-height: 56px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+
+      .answer-choice {
+        display: inline-flex;
+        min-width: 110px;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 10px 18px;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.22s ease;
+      }
+
+      .answer-choice:hover {
+        background: rgba(141, 111, 190, 0.34);
+      }
+
+      .answer-choice input {
+        accent-color: var(--rose);
+      }
+
+      .no-choice {
+        position: relative;
+      }
+
+      .email-status {
+        min-height: 1.5em;
+        margin: 18px 0 0;
+        color: var(--rose);
+        font-size: 14px;
+      }
+
+      @keyframes story-arrive {
+        from { opacity: 0; transform: translateY(12px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      @keyframes twinkle {
+        from { opacity: 0.35; transform: scale(0.8) rotate(-12deg); }
+        to { opacity: 0.95; transform: scale(1.2) rotate(12deg); }
+      }
+
 
       .tabs {
         display: flex;
@@ -689,6 +940,7 @@
         <div class="gate-actions">
           <button type="submit">Enter</button>
           <button type="button" id="gate-skip">Just look around</button>
+          <button type="button" id="gate-preview" hidden>Preview surprise</button>
         </div>
       </form>
     </div>
@@ -732,6 +984,9 @@
           </div>
         </div>
         <p class="countdown-message" id="countdown-message" hidden></p>
+        <button class="story-action preview-button" id="preview-proposal" type="button" hidden>
+          Preview the surprise
+        </button>
       </section>
 
       <div class="tabs" role="tablist" aria-label="Layers">
@@ -846,6 +1101,44 @@
       <footer class="footer">I will win.</footer>
     </main>
 
+    <div
+      class="story-overlay"
+      id="story-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="story-title"
+      tabindex="-1"
+      hidden
+    >
+      <div class="memory-constellation" id="memory-constellation" aria-hidden="true" hidden></div>
+      <section class="story-card">
+        <button class="story-close" id="story-close" type="button" hidden>Close preview</button>
+        <p class="eyebrow">Reasons</p>
+        <h2 class="story-title" id="story-title">All the things we wrote</h2>
+        <p class="story-progress" id="story-progress" role="status" aria-live="polite">Gathering all our little things...</p>
+        <p class="story-preview-note" id="story-preview-note" hidden>Preview mode</p>
+        <article class="story-moment" id="story-moment" aria-live="polite" aria-atomic="true"></article>
+        <button class="story-action" id="story-retry" type="button" hidden>Try loading them again</button>
+        <section class="proposal-question" id="proposal-question" aria-labelledby="proposal-title" hidden>
+          <h3 id="proposal-title">Be with me?</h3>
+          <p>Did I win?</p>
+          <fieldset class="answer-options">
+            <legend class="sr-only">Choose yes or no</legend>
+            <label class="answer-choice" for="answer-yes">
+              <input id="answer-yes" type="radio" name="answer" value="yes" />
+              <span>Yes</span>
+            </label>
+            <label class="answer-choice no-choice" id="answer-no-label" for="answer-no">
+              <input id="answer-no" type="radio" name="answer" value="no" />
+              <span>No</span>
+            </label>
+          </fieldset>
+          <p class="email-status" id="email-status" role="status" aria-live="polite"></p>
+        </section>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>
       (() => {
         const canvas = document.querySelector("#sky");
@@ -948,15 +1241,28 @@
       };
       const countdown = document.querySelector("#countdown");
       const countdownMessage = document.querySelector("#countdown-message");
-      const dDay = new Date(2026, 9, 21, 12);
+      const countdownDate = document.querySelector(".countdown-date time");
+      const testCountdown = new URLSearchParams(window.location.search).get("testCountdown") === "1";
+      const dDay = testCountdown
+        ? new Date(Date.now() + 60 * 1000)
+        : new Date(2026, 9, 21, 12);
+      if (testCountdown) {
+        countdownDate.dateTime = dDay.toISOString();
+        countdownDate.textContent = "One-minute test countdown";
+      }
+      let countdownExpired = false;
+      let appReady = false;
+      let proposalStarted = false;
 
       function updateCountdown() {
         const remaining = dDay.getTime() - Date.now();
         if (remaining <= 0) {
           countdown.hidden = true;
           countdownMessage.hidden = false;
-          countdownMessage.textContent = "D-Day is here.";
+          countdownMessage.textContent = "Fml";
+          countdownExpired = true;
           clearInterval(countdownInterval);
+          startProposalIfReady();
           return;
         }
 
@@ -1005,6 +1311,7 @@
           localStorage.setItem(unlockKey, PASSWORD_HASH);
           gate.hidden = true;
           applyLockState();
+          startProposalIfReady();
         } else {
           gateError.textContent = "That's not it.";
         }
@@ -1012,6 +1319,7 @@
 
       document.querySelector("#gate-skip").addEventListener("click", () => {
         gate.hidden = true;
+        startProposalIfReady();
       });
 
       lockToggle.addEventListener("click", () => {
@@ -1671,6 +1979,387 @@
         }, 15000);
         render();
       })();
+
+      const storyOverlay = document.querySelector("#story-overlay");
+      const storyProgress = document.querySelector("#story-progress");
+      const storyMoment = document.querySelector("#story-moment");
+      const storyRetry = document.querySelector("#story-retry");
+      const storyClose = document.querySelector("#story-close");
+      const storyCard = document.querySelector(".story-card");
+      const memoryConstellation = document.querySelector("#memory-constellation");
+      const storyPreviewNote = document.querySelector("#story-preview-note");
+      const previewButton = document.querySelector("#preview-proposal");
+      const gatePreviewButton = document.querySelector("#gate-preview");
+      const proposalQuestion = document.querySelector("#proposal-question");
+      const yesChoice = document.querySelector("#answer-yes");
+      const noChoiceLabel = document.querySelector("#answer-no-label");
+      const emailStatus = document.querySelector("#email-status");
+      // EmailJS resolves this reserved ID to the default service configured in the dashboard.
+      const EMAILJS_SERVICE_ID = "default_service";
+      const EMAILJS_TEMPLATE_ID = "template_uvm7vo3";
+      const EMAILJS_PUBLIC_KEY = "SlGKatEOamjcjvKcu";
+      const ENABLE_PREVIEW = false;
+      let proposalItems = [];
+      let proposalIndex = 0;
+      let proposalTimer = 0;
+      let proposalPreviewMode = false;
+      let emailSending = false;
+      let emailSent = false;
+      let noChoiceDodges = 0;
+      let noChoiceBaseRect = null;
+
+      function startProposalIfReady() {
+        if (!appReady || !countdownExpired || proposalStarted) {
+          return;
+        }
+
+        openProposal(false);
+      }
+
+      function openProposal(preview) {
+        if (proposalStarted) {
+          return;
+        }
+
+        gate.hidden = true;
+        proposalStarted = true;
+        proposalPreviewMode = preview;
+        storyClose.hidden = !preview;
+        storyPreviewNote.hidden = !preview;
+        memoryConstellation.hidden = true;
+        memoryConstellation.replaceChildren();
+        storyCard.classList.remove("question-stage");
+        storyOverlay.hidden = false;
+        document.body.classList.add("story-active");
+        document.querySelector("main").inert = true;
+        storyOverlay.focus();
+        loadProposalItems();
+      }
+
+      function closeProposalPreview() {
+        if (!proposalPreviewMode) {
+          return;
+        }
+
+        window.clearTimeout(proposalTimer);
+        storyOverlay.hidden = true;
+        document.body.classList.remove("story-active");
+        document.querySelector("main").inert = false;
+        storyClose.hidden = true;
+        storyPreviewNote.hidden = true;
+        memoryConstellation.hidden = true;
+        memoryConstellation.replaceChildren();
+        storyCard.classList.remove("question-stage");
+        storyRetry.hidden = true;
+        proposalQuestion.hidden = true;
+        storyMoment.hidden = false;
+        storyMoment.replaceChildren();
+        storyProgress.textContent = "Gathering all our little things...";
+        proposalItems = [];
+        proposalIndex = 0;
+        proposalStarted = false;
+        proposalPreviewMode = false;
+        emailStatus.textContent = "";
+        yesChoice.checked = false;
+        document.querySelector("#answer-no").checked = false;
+        noChoiceLabel.style.removeProperty("transform");
+        noChoiceDodges = 0;
+        noChoiceBaseRect = null;
+        previewButton.focus();
+      }
+
+      async function loadProposalItems() {
+        storyRetry.hidden = true;
+        proposalQuestion.hidden = true;
+        storyProgress.textContent = "Gathering all our little things...";
+
+        try {
+          const [notes, eventData, adoredData] = await Promise.all([
+            fetchNotes(),
+            api("events"),
+            api("adored"),
+          ]);
+          if (!proposalStarted) {
+            return;
+          }
+          const defaults = Array.from(document.querySelectorAll("#observations [data-default-note]"));
+          const defaultIds = new Set(defaults.map((item) => item.dataset.defaultNote));
+          const notesById = new Map(notes.map((note) => [note.id, note]));
+          const items = defaults
+            .map((item) => {
+              const id = item.dataset.defaultNote;
+              const text = notesById.get(id)?.text || item.querySelector("p")?.textContent.trim();
+              return text ? { category: "A reason we wrote", text } : null;
+            })
+            .filter(Boolean);
+
+          notes
+            .filter((note) => !defaultIds.has(note.id))
+            .forEach((note) => items.push({ category: "A reason we wrote", text: note.text }));
+
+          Object.keys(eventData || {})
+            .sort()
+            .forEach((id) => {
+              const event = eventData[id];
+              if (event && typeof event.text === "string" && event.text.trim()) {
+                const date = /^\d{4}-\d{2}-\d{2}$/.test(event.date || "")
+                  ? new Date(`${event.date}T12:00:00`).toLocaleDateString(undefined, { dateStyle: "long" })
+                  : "";
+                items.push({
+                  category: "A moment we kept",
+                  text: event.text.trim(),
+                  detail: date,
+                });
+              }
+            });
+
+          Object.keys(adoredData || {})
+            .sort()
+            .forEach((id) => {
+              const entry = adoredData[id];
+              if (entry && typeof entry.text === "string" && entry.text.trim()) {
+                items.push({ category: "Something I adore", text: entry.text.trim() });
+              }
+            });
+
+          if (items.length === 0) {
+            throw new Error("No saved notes were returned.");
+          }
+
+          proposalItems = items;
+          proposalIndex = 0;
+          showNextProposalItem();
+        } catch (error) {
+          if (!proposalStarted) {
+            return;
+          }
+          console.error("Could not load the proposal memories.", error);
+          storyProgress.textContent = "I couldn't load all our saved things. Check your connection, then try again.";
+          storyRetry.hidden = false;
+          storyRetry.focus();
+        }
+      }
+
+      function showNextProposalItem() {
+        if (proposalIndex >= proposalItems.length) {
+          showProposalQuestion();
+          return;
+        }
+
+        const item = proposalItems[proposalIndex];
+        storyProgress.textContent = `${proposalIndex + 1} of ${proposalItems.length}`;
+        storyMoment.hidden = false;
+        const category = document.createElement("p");
+        category.className = "story-category";
+        category.textContent = item.category;
+        const text = document.createElement("p");
+        text.className = "story-text";
+        text.textContent = item.text;
+        const content = [category, text];
+        if (item.detail) {
+          const detail = document.createElement("p");
+          detail.className = "story-detail";
+          detail.textContent = item.detail;
+          content.push(detail);
+        }
+        storyMoment.replaceChildren(...content);
+        storyMoment.classList.remove("arrive");
+        void storyMoment.offsetWidth;
+        storyMoment.classList.add("arrive");
+        proposalIndex += 1;
+
+        const delay = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1100 : 1900;
+        proposalTimer = window.setTimeout(showNextProposalItem, delay);
+      }
+
+      function showProposalQuestion() {
+        window.clearTimeout(proposalTimer);
+        storyMoment.replaceChildren();
+        storyMoment.hidden = true;
+        storyProgress.textContent = `${proposalItems.length} little things, all leading here`;
+        noChoiceLabel.style.removeProperty("transform");
+        noChoiceDodges = 0;
+        noChoiceBaseRect = null;
+        storyCard.classList.add("question-stage");
+        proposalQuestion.hidden = false;
+        memoryConstellation.hidden = false;
+        renderMemoryConstellation();
+        yesChoice.focus({ preventScroll: true });
+      }
+
+      function renderMemoryConstellation() {
+        memoryConstellation.replaceChildren();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const card = storyCard.getBoundingClientRect();
+        const narrow = viewportWidth < 760;
+        const lanes = Array.from({ length: narrow ? 2 : 4 }, () => []);
+        proposalItems.forEach((item, index) => lanes[index % lanes.length].push({ item, index }));
+
+        function addMemorySpark(entry, left, top, width, rowHeight) {
+          const spark = document.createElement("span");
+          spark.className = "memory-spark";
+          spark.textContent = entry.item.text;
+          spark.title = `${entry.item.category}: ${entry.item.text}`;
+          spark.style.left = `${left}px`;
+          spark.style.top = `${top}px`;
+          spark.style.width = `${Math.max(80, Math.min(220, width))}px`;
+          spark.style.fontSize = rowHeight < 30 ? "9px" : "11px";
+          spark.style.animationDelay = `${(entry.index % 8) * -0.35}s`;
+          memoryConstellation.append(spark);
+        }
+
+        if (narrow) {
+          const topInset = 16;
+          const topHeight = Math.max(24, card.top - topInset - 12);
+          const bottomTop = card.bottom + 20;
+          const bottomHeight = Math.max(24, viewportHeight - bottomTop - 16);
+          [topHeight, bottomHeight].forEach((areaHeight, laneIndex) => {
+            const entries = lanes[laneIndex];
+            const columns = 3;
+            const rows = Math.ceil(entries.length / columns);
+            const cellWidth = viewportWidth / columns;
+            const rowHeight = areaHeight / rows;
+            entries.forEach((entry, index) => {
+              const column = index % columns;
+              const row = Math.floor(index / columns);
+              const top = laneIndex === 0
+                ? topInset + (row + 0.5) * rowHeight
+                : bottomTop + (row + 0.5) * rowHeight;
+              addMemorySpark(entry, (column + 0.5) * cellWidth, top, cellWidth - 8, rowHeight);
+            });
+          });
+          return;
+        }
+
+        const topInset = 12;
+        const topHeight = Math.max(24, card.top - topInset - 12);
+        const bottomTop = card.bottom + 18;
+        const bottomHeight = Math.max(24, viewportHeight - bottomTop - 16);
+        const horizontalColumns = Math.max(1, Math.floor(viewportWidth / 210));
+        [0, 2].forEach((laneIndex, areaIndex) => {
+          const entries = lanes[laneIndex];
+          const areaHeight = areaIndex === 0 ? topHeight : bottomHeight;
+          const areaTop = areaIndex === 0 ? topInset : bottomTop;
+          const rows = Math.ceil(entries.length / horizontalColumns);
+          const cellWidth = viewportWidth / horizontalColumns;
+          const rowHeight = areaHeight / rows;
+          entries.forEach((entry, index) => {
+            const column = index % horizontalColumns;
+            const row = Math.floor(index / horizontalColumns);
+            addMemorySpark(entry, (column + 0.5) * cellWidth, areaTop + (row + 0.5) * rowHeight, cellWidth - 10, rowHeight);
+          });
+        });
+
+        [1, 3].forEach((laneIndex, areaIndex) => {
+          const entries = lanes[laneIndex];
+          const sideWidth = areaIndex === 0 ? card.left - 12 : viewportWidth - card.right - 12;
+          const sideLeft = areaIndex === 0 ? 6 : card.right + 6;
+          const rowHeight = card.height / entries.length;
+          entries.forEach((entry, index) => {
+            addMemorySpark(entry, sideLeft + sideWidth / 2, card.top + (index + 0.5) * rowHeight, sideWidth - 8, rowHeight);
+          });
+        });
+      }
+
+      storyRetry.addEventListener("click", loadProposalItems);
+      previewButton.hidden = !ENABLE_PREVIEW;
+      gatePreviewButton.hidden = !ENABLE_PREVIEW;
+      if (ENABLE_PREVIEW) {
+        previewButton.addEventListener("click", () => openProposal(true));
+        gatePreviewButton.addEventListener("click", () => openProposal(true));
+      }
+      storyClose.addEventListener("click", closeProposalPreview);
+      window.addEventListener("resize", () => {
+        if (!proposalQuestion.hidden && !memoryConstellation.hidden) {
+          renderMemoryConstellation();
+        }
+      });
+
+      noChoiceLabel.addEventListener("pointerenter", (event) => {
+        if (event.pointerType !== "mouse" || noChoiceDodges >= 11) {
+          return;
+        }
+        if (!noChoiceBaseRect) {
+          noChoiceBaseRect = noChoiceLabel.getBoundingClientRect();
+        }
+
+        const card = storyCard.getBoundingClientRect();
+        const jump = [
+          { x: -170, y: -105 },
+          { x: 155, y: 100 },
+          { x: -135, y: 90 },
+          { x: 165, y: -95 },
+          { x: -155, y: -55 },
+          { x: 125, y: 125 },
+          { x: -175, y: 45 },
+          { x: 145, y: -120 },
+          { x: -110, y: 115 },
+          { x: 170, y: 55 },
+          { x: -160, y: -115 },
+        ][noChoiceDodges];
+        const padding = 24;
+        const minX = card.left + padding - noChoiceBaseRect.left;
+        const maxX = card.right - padding - noChoiceBaseRect.right;
+        const minY = card.top + padding - noChoiceBaseRect.top;
+        const maxY = card.bottom - padding - noChoiceBaseRect.bottom;
+        const x = Math.max(minX, Math.min(maxX, jump.x));
+        const y = Math.max(minY, Math.min(maxY, jump.y));
+        noChoiceLabel.style.transform = `translate(${x}px, ${y}px)`;
+        noChoiceDodges += 1;
+      });
+
+      document.querySelector(".answer-options").addEventListener("change", (event) => {
+        if (proposalPreviewMode) {
+          emailStatus.textContent = "Preview only — no email will be sent.";
+        } else if (event.target.value === "yes") {
+          sendYesEmail();
+        } else {
+          emailStatus.textContent = "Thank you for being honest. No is always a real answer.";
+        }
+      });
+
+      async function sendYesEmail() {
+        if (emailSending || emailSent) {
+          return;
+        }
+        if (!EMAILJS_SERVICE_ID) {
+          emailStatus.textContent = "Yes! I can't send the email yet because the EmailJS service ID is missing.";
+          return;
+        }
+        if (!window.emailjs) {
+          console.error("The EmailJS Browser SDK did not load.");
+          emailStatus.textContent = "Email could not be sent because the EmailJS library did not load.";
+          return;
+        }
+
+        emailSending = true;
+        emailStatus.textContent = "Sending your yes...";
+        try {
+          await window.emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            {
+              answer: "Yes",
+              message: "She clicked Yes on “Be with me?”",
+              answered_at: new Date().toLocaleString(),
+              page_url: window.location.href,
+            },
+            { publicKey: EMAILJS_PUBLIC_KEY }
+          );
+          emailSent = true;
+          emailStatus.textContent = "Sent! A little yes is on its way. ✦";
+        } catch (error) {
+          console.error("EmailJS could not send the yes notification.", error);
+          emailStatus.textContent = "Your answer is here, but EmailJS could not send the email. Check its default service and recipient, then try again.";
+          yesChoice.checked = false;
+        } finally {
+          emailSending = false;
+        }
+      }
+
+      appReady = true;
+      startProposalIfReady();
     </script>
   </body>
 </html>

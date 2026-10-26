@@ -316,6 +316,7 @@
 
       .tabs {
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
         margin: 0 0 8px;
         padding: 4px;
@@ -325,7 +326,7 @@
       }
 
       .tab {
-        flex: 1;
+        flex: 1 1 max-content;
         padding: 9px 12px;
         border: 0;
         border-radius: 8px;
@@ -633,6 +634,7 @@
         <button class="tab" id="tab-reasons" role="tab" type="button" aria-selected="true" aria-controls="view-reasons">Reasons</button>
         <button class="tab" id="tab-calendar" role="tab" type="button" aria-selected="false" aria-controls="view-calendar">Calendar</button>
         <button class="tab" id="tab-adored" role="tab" type="button" aria-selected="false" aria-controls="view-adored">Things Adored</button>
+        <button class="tab" id="tab-wanted" role="tab" type="button" aria-selected="false" aria-controls="view-wanted">Things wanted</button>
       </div>
 
       <div id="view-reasons" role="tabpanel" aria-labelledby="tab-reasons">
@@ -735,6 +737,24 @@
             <button type="submit">Add</button>
           </form>
           <p class="status" id="adored-status" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <div id="view-wanted" role="tabpanel" aria-labelledby="tab-wanted" hidden>
+        <section aria-labelledby="wanted-title">
+          <div class="list-heading">
+            <h2 id="wanted-title">Things wanted:</h2>
+          </div>
+          <ul class="observations" id="wanted-list"></ul>
+        </section>
+        <section class="add-card" aria-labelledby="wanted-add-title">
+          <h2 id="wanted-add-title">Add more</h2>
+          <form class="add-form" id="wanted-form">
+            <label for="wanted-input" class="sr-only">Something wanted</label>
+            <input id="wanted-input" type="text" maxlength="180" placeholder="..." autocomplete="off" required />
+            <button type="submit">Add</button>
+          </form>
+          <p class="status" id="wanted-status" role="status" aria-live="polite"></p>
         </section>
       </div>
 
@@ -1246,9 +1266,16 @@
 
         const tabAdored = document.querySelector("#tab-adored");
         const viewAdored = document.querySelector("#view-adored");
+        const tabWanted = document.querySelector("#tab-wanted");
+        const viewWanted = document.querySelector("#view-wanted");
 
         function showTab(name) {
-          const views = { reasons: [tabReasons, viewReasons], calendar: [tabCalendar, viewCalendar], adored: [tabAdored, viewAdored] };
+          const views = {
+            reasons: [tabReasons, viewReasons],
+            calendar: [tabCalendar, viewCalendar],
+            adored: [tabAdored, viewAdored],
+            wanted: [tabWanted, viewWanted],
+          };
           for (const [key, [tab, view]] of Object.entries(views)) {
             view.hidden = key !== name;
             tab.setAttribute("aria-selected", String(key === name));
@@ -1257,11 +1284,14 @@
             loadEvents();
           } else if (name === "adored") {
             loadAdored();
+          } else if (name === "wanted") {
+            loadWanted();
           }
         }
         tabReasons.addEventListener("click", () => showTab("reasons"));
         tabCalendar.addEventListener("click", () => showTab("calendar"));
         tabAdored.addEventListener("click", () => showTab("adored"));
+        tabWanted.addEventListener("click", () => showTab("wanted"));
 
         // Things adored layer: shared list under /adored, seeded once via /adored_seeded.
         const adoredList = document.querySelector("#adored-list");
@@ -1367,6 +1397,107 @@
 
         setInterval(() => {
           if (!viewAdored.hidden && !document.hidden) loadAdored();
+        }, 15000);
+
+        // Things wanted layer: shared entries stored under /wanted.
+        const wantedList = document.querySelector("#wanted-list");
+        const wantedForm = document.querySelector("#wanted-form");
+        const wantedInput = document.querySelector("#wanted-input");
+        const wantedStatus = document.querySelector("#wanted-status");
+        let wanted = [];
+
+        function wantedSay(message) {
+          wantedStatus.textContent = message;
+        }
+
+        async function loadWanted() {
+          try {
+            const data = await api("wanted");
+            wanted = Object.keys(data || {})
+              .sort()
+              .map((id) => ({ id, ...data[id] }))
+              .filter((entry) => typeof entry.text === "string");
+            if (!wantedList.querySelector(".observation-edit-input")) {
+              renderWanted();
+            }
+          } catch {
+            wantedSay("Could not reach the shared list. Check your connection.");
+          }
+        }
+
+        function renderWanted() {
+          wantedList.replaceChildren();
+          wanted.forEach((entry) => {
+            const item = document.createElement("li");
+            item.className = "observation";
+            const star = document.createElement("span");
+            star.className = "star";
+            star.setAttribute("aria-hidden", "true");
+            star.textContent = "✦";
+            const text = document.createElement("p");
+            text.textContent = entry.text;
+            const actions = document.createElement("div");
+            actions.className = "item-actions";
+            const edit = document.createElement("button");
+            edit.className = "item-action";
+            edit.type = "button";
+            edit.textContent = "Edit";
+            edit.addEventListener("click", () => {
+              beginEditing(item, entry, async (updatedText) => {
+                await api(`wanted/${entry.id}`, {
+                  method: "PATCH",
+                  body: JSON.stringify({ text: updatedText }),
+                });
+              }, () => renderWanted());
+            });
+            const remove = document.createElement("button");
+            remove.className = "item-action";
+            remove.type = "button";
+            remove.textContent = "Remove";
+            remove.addEventListener("click", async () => {
+              remove.disabled = true;
+              try {
+                await api(`wanted/${entry.id}`, { method: "DELETE" });
+                wanted = wanted.filter((saved) => saved.id !== entry.id);
+                renderWanted();
+                wantedSay("Removed.");
+              } catch {
+                remove.disabled = false;
+                wantedSay("Could not remove the entry. Try again.");
+              }
+            });
+            actions.append(edit, remove);
+            item.append(star, text, actions);
+            wantedList.append(item);
+          });
+        }
+
+        wantedForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const text = wantedInput.value.trim();
+          if (!text) {
+            wantedSay("Write something before adding it.");
+            wantedInput.focus();
+            return;
+          }
+          try {
+            const result = await api("wanted", {
+              method: "POST",
+              body: JSON.stringify({ text, createdAt: { ".sv": "timestamp" } }),
+            });
+            const created = await api(`wanted/${result.name}`);
+            wanted.push({ id: result.name, ...created });
+            wantedInput.value = "";
+            renderWanted();
+            wantedSay("Added.");
+          } catch {
+            wantedSay("Could not save the entry. It was not added; try again.");
+          }
+          wantedInput.focus();
+        });
+
+        setInterval(() => {
+          if (!viewWanted.hidden && !document.hidden) loadWanted();
         }, 15000);
 
         async function loadEvents() {

@@ -18,35 +18,39 @@
       font-family: sans-serif;
       overflow: auto;
     }
-    .layer {
+    .smoke, .flower, .spotlight {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
     }
-    .flower { object-fit: cover; object-position: center; }
-    .smoke { mix-blend-mode: screen; }
-    #smoke-back { z-index: 1; }
-    .flower-base { z-index: 2; }
-    /* brightened copy of the flower, revealed only near the spotlight */
-    .flower-lit {
-      z-index: 3;
-      filter: brightness(1.9) contrast(1.1) saturate(1.1);
-      -webkit-mask-image: radial-gradient(ellipse 22% 30% at 56% 42%, #000 0%, rgba(0,0,0,.6) 45%, transparent 100%);
-      mask-image: radial-gradient(ellipse 22% 30% at 56% 42%, #000 0%, rgba(0,0,0,.6) 45%, transparent 100%);
-    }
-    /* soft visible cone of light from the top right */
-    .beam {
-      z-index: 4;
+    .smoke {
       mix-blend-mode: screen;
-      background: linear-gradient(to bottom left, rgba(255, 244, 220, .5), rgba(255, 244, 220, .12) 60%, transparent);
-      clip-path: polygon(96% -6%, 108% 4%, 62% 62%, 50% 52%);
-      filter: blur(22px);
-      opacity: .55;
     }
-    #smoke-front { z-index: 5; }
+    .flower {
+      object-fit: cover;
+      object-position: center;
+    }
+    .spotlight {
+      filter: blur(28px);
+      mix-blend-mode: screen;
+      -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    }
+    .spotlight::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 10%, rgba(255, 242, 210, 0.12) 48%, transparent 85%);
+      clip-path: polygon(88% 0, 91% 0, 45% 100%, 12% 100%);
+    }
+    #smoke-front {
+      opacity: 0.55;
+      transform: scaleX(-1);
+    }
     .large-text {
+      position: relative;
       font-family: monospace;
       font-size: clamp(0.65rem, 2vw, 2rem);
       font-weight: bold;
@@ -58,24 +62,24 @@
 </head>
 <body>
 
-  <canvas id="smoke-back" class="layer smoke"></canvas>
-  <img class="layer flower flower-base" src="./lily.png" alt="">
-  <img class="layer flower flower-lit" src="./lily.png" alt="">
-  <div class="layer beam"></div>
-  <canvas id="smoke-front" class="layer smoke"></canvas>
+  <canvas id="smoke-back" class="smoke" aria-hidden="true"></canvas>
+  <img class="flower" src="./lily.png" alt="">
+  <div class="spotlight" aria-hidden="true"></div>
+  <canvas id="smoke-front" class="smoke" aria-hidden="true"></canvas>
   <pre class="large-text"></pre>
 
   <script>
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const start = performance.now();
-    let target = [-1, -1], cur = [-1, -1];
-    addEventListener('pointermove', e => {
-      target = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
-    });
-
-    const initSmoke = (canvas, offset, amp) => {
+    (() => {
+      const canvas = document.createElement('canvas');
+      const back = document.getElementById('smoke-back');
+      const front = document.getElementById('smoke-front');
       const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false });
-      if (!gl) return;
+      const backContext = back.getContext('2d');
+      const frontContext = front.getContext('2d');
+      if (!gl || !backContext || !frontContext) {
+        console.error('Unable to initialize the smoke effect.');
+        return;
+      }
 
       const vs = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
       const fs = `
@@ -83,8 +87,6 @@
         uniform vec2 res;
         uniform float t;
         uniform vec2 mouse;
-        uniform vec2 off;
-        uniform float amp;
 
         float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float noise(vec2 p){
@@ -101,7 +103,7 @@
         }
 
         void main(){
-          vec2 uv = gl_FragCoord.xy / res.y + off;
+          vec2 uv = gl_FragCoord.xy / res.y;
           float s = t * .05;
 
           // domain-warped fbm gives swirling, wispy tendrils
@@ -112,10 +114,10 @@
           float d = fbm(uv * 1.8 + 3.2 * r);
 
           // gentle push of the smoke away from the cursor
-          vec2 m = mouse * res / res.y + off;
+          vec2 m = mouse * res / res.y;
           d *= smoothstep(.0, .35, distance(uv, m)) * .5 + .5;
 
-          float a = smoothstep(.35, .95, d) * amp;
+          float a = smoothstep(.35, .95, d) * .08;
           vec3 col = mix(vec3(.62, .66, .78), vec3(1., .96, .92), r.x);
           gl_FragColor = vec4(col * a, a);
         }`;
@@ -124,13 +126,18 @@
         const s = gl.createShader(type);
         gl.shaderSource(s, src);
         gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          throw new Error(`Smoke shader failed to compile: ${gl.getShaderInfoLog(s)}`);
+        }
         return s;
       };
       const prog = gl.createProgram();
       gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
       gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
       gl.linkProgram(prog);
-      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+        throw new Error(`Smoke shader failed to link: ${gl.getProgramInfoLog(prog)}`);
+      }
       gl.useProgram(prog);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
@@ -142,42 +149,50 @@
       const uRes = gl.getUniformLocation(prog, 'res');
       const uT = gl.getUniformLocation(prog, 't');
       const uMouse = gl.getUniformLocation(prog, 'mouse');
-      const uOff = gl.getUniformLocation(prog, 'off');
-      const uAmp = gl.getUniformLocation(prog, 'amp');
 
       // render at reduced resolution; smoke is soft so it stays light on the GPU
-      const scale = 0.9
+      const scale = 1.0;
+      let frameRequested = false;
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      const requestFrame = () => {
+        if (!frameRequested) {
+          frameRequested = true;
+          requestAnimationFrame(frame);
+        }
+      };
       const resize = () => {
         canvas.width = Math.max(1, Math.floor(innerWidth * scale));
         canvas.height = Math.max(1, Math.floor(innerHeight * scale));
+        back.width = front.width = canvas.width;
+        back.height = front.height = canvas.height;
         gl.viewport(0, 0, canvas.width, canvas.height);
+        requestFrame();
       };
       addEventListener('resize', resize);
-      resize();
 
+      let target = [-1, -1], cur = [-1, -1];
+      addEventListener('pointermove', e => {
+        target = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
+      });
+
+      const start = performance.now();
       const frame = now => {
-        gl.useProgram(prog);
+        frameRequested = false;
+        cur[0] += (target[0] - cur[0]) * .05;
+        cur[1] += (target[1] - cur[1]) * .05;
         gl.uniform2f(uRes, canvas.width, canvas.height);
-        gl.uniform1f(uT, reduce ? 0 : (now - start) / 1000);
+        gl.uniform1f(uT, reduce.matches ? 0 : (now - start) / 1000);
         gl.uniform2f(uMouse, cur[0], cur[1]);
-        gl.uniform2f(uOff, offset[0], offset[1]);
-        gl.uniform1f(uAmp, amp);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
-        if (!reduce) requestAnimationFrame(frame);
+        backContext.clearRect(0, 0, back.width, back.height);
+        backContext.drawImage(canvas, 0, 0);
+        frontContext.clearRect(0, 0, front.width, front.height);
+        frontContext.drawImage(canvas, 0, 0);
+        if (!reduce.matches) requestFrame();
       };
-      requestAnimationFrame(frame);
-    };
-
-    // shared smoothing of the cursor position, updated once per frame
-    const track = () => {
-      cur[0] += (target[0] - cur[0]) * .05;
-      cur[1] += (target[1] - cur[1]) * .05;
-      requestAnimationFrame(track);
-    };
-    if (!reduce) track();
-
-    initSmoke(document.getElementById('smoke-back'), [0, 0], .05);
-    initSmoke(document.getElementById('smoke-front'), [11.3, 6.7], .07);
+      reduce.addEventListener('change', requestFrame);
+      resize();
+    })();
   </script>
 
 </body>

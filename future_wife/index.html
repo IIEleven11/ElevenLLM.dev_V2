@@ -146,7 +146,7 @@
       const uAmp = gl.getUniformLocation(prog, 'amp');
 
       // render at reduced resolution; smoke is soft so it stays light on the GPU
-      const scale = 1.0;
+      const scale = 0.9
       const resize = () => {
         canvas.width = Math.max(1, Math.floor(innerWidth * scale));
         canvas.height = Math.max(1, Math.floor(innerHeight * scale));
@@ -176,7 +176,7 @@
     };
     if (!reduce) track();
 
-    initSmoke(document.getElementById('smoke-back'), [0, 0], .08);
+    initSmoke(document.getElementById('smoke-back'), [0, 0], .05);
     initSmoke(document.getElementById('smoke-front'), [11.3, 6.7], .07);
   </script>
 

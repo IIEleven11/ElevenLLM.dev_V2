@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To Be Decided</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      color: #ffffC2;
+      display: flex;
+      justify-content: center; /* Centers horizontally (X-axis) */
+      align-items: center;     /* Centers vertically (Y-axis) */
+      font-family: sans-serif;
+      overflow: auto;
+    }
+    .smoke, .flower, .spotlight {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .smoke {
+      mix-blend-mode: screen;
+    }
+    .flower {
+      object-fit: cover;
+      object-position: center;
+    }
+    .spotlight {
+      filter: blur(28px);
+      mix-blend-mode: screen;
+      -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    }
+    .spotlight::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 10%, rgba(255, 242, 210, 0.12) 48%, transparent 85%);
+      clip-path: polygon(88% 0, 91% 0, 45% 100%, 12% 100%);
+    }
+    #smoke-front {
+      opacity: 0.55;
+      transform: scaleX(-1);
+    }
+    .large-text {
+      position: relative;
+      font-family: monospace;
+      font-size: clamp(0.65rem, 2vw, 2rem);
+      font-weight: bold;
+      line-height: 1;
+      white-space: pre;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="smoke-back" class="smoke" aria-hidden="true"></canvas>
+  <img class="flower" src="./lilycave.png" alt="">
+  <div class="spotlight" aria-hidden="true"></div>
+  <canvas id="smoke-front" class="smoke" aria-hidden="true"></canvas>
+  <pre class="large-text"></pre>
+
+  <script>
+    (() => {
+      const canvas = document.createElement('canvas');
+      const back = document.getElementById('smoke-back');
+      const front = document.getElementById('smoke-front');
+      const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false });
+      const backContext = back.getContext('2d');
+      const frontContext = front.getContext('2d');
+      if (!gl || !backContext || !frontContext) {
+        console.error('Unable to initialize the smoke effect.');
+        return;
+      }
+
+      const vs = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
+      const fs = `
+        precision mediump float;
+        uniform vec2 res;
+        uniform float t;
+        uniform vec2 mouse;
+
+        float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        float noise(vec2 p){
+          vec2 i = floor(p), f = fract(p);
+          f = f * f * (3. - 2. * f);
+          return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x),
+                     mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
+        }
+        float fbm(vec2 p){
+          float v = 0., a = .5;
+          mat2 r = mat2(.8, -.6, .6, .8);
+          for (int i = 0; i < 5; i++){ v += a * noise(p); p = r * p * 2.02 + 7.3; a *= .5; }
+          return v;
+        }
+
+        void main(){
+          vec2 uv = gl_FragCoord.xy / res.y;
+          float s = t * .05;
+
+          // domain-warped fbm gives swirling, wispy tendrils
+          vec2 q = vec2(fbm(uv * 1.6 + vec2(s, -s * .6)),
+                        fbm(uv * 1.6 + vec2(-s * .8, s) + 5.2));
+          vec2 r = vec2(fbm(uv * 2. + 3. * q + vec2(1.7, 9.2) + s * 1.2),
+                        fbm(uv * 2. + 3. * q + vec2(8.3, 2.8) - s));
+          float d = fbm(uv * 1.8 + 3.2 * r);
+
+          // gentle push of the smoke away from the cursor
+          vec2 m = mouse * res / res.y;
+          d *= smoothstep(.0, .35, distance(uv, m)) * .5 + .5;
+
+          float a = smoothstep(.35, .95, d) * .08;
+          vec3 col = mix(vec3(.62, .66, .78), vec3(1., .96, .92), r.x);
+          gl_FragColor = vec4(col * a, a);
+        }`;
+
+      const sh = (type, src) => {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          throw new Error(`Smoke shader failed to compile: ${gl.getShaderInfoLog(s)}`);
+        }
+        return s;
+      };
+      const prog = gl.createProgram();
+      gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
+      gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+      gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+        throw new Error(`Smoke shader failed to link: ${gl.getProgramInfoLog(prog)}`);
+      }
+      gl.useProgram(prog);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(prog, 'p');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      const uRes = gl.getUniformLocation(prog, 'res');
+      const uT = gl.getUniformLocation(prog, 't');
+      const uMouse = gl.getUniformLocation(prog, 'mouse');
+
+      // render at reduced resolution; smoke is soft so it stays light on the GPU
+      const scale = 1.0;
+      let frameRequested = false;
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+      const requestFrame = () => {
+        if (!frameRequested) {
+          frameRequested = true;
+          requestAnimationFrame(frame);
+        }
+      };
+      const resize = () => {
+        canvas.width = Math.max(1, Math.floor(innerWidth * scale));
+        canvas.height = Math.max(1, Math.floor(innerHeight * scale));
+        back.width = front.width = canvas.width;
+        back.height = front.height = canvas.height;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        requestFrame();
+      };
+      addEventListener('resize', resize);
+
+      let target = [-1, -1], cur = [-1, -1];
+      addEventListener('pointermove', e => {
+        target = [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
+      });
+
+      const start = performance.now();
+      const frame = now => {
+        frameRequested = false;
+        cur[0] += (target[0] - cur[0]) * .05;
+        cur[1] += (target[1] - cur[1]) * .05;
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.uniform1f(uT, reduce.matches ? 0 : (now - start) / 1000);
+        gl.uniform2f(uMouse, cur[0], cur[1]);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        backContext.clearRect(0, 0, back.width, back.height);
+        backContext.drawImage(canvas, 0, 0);
+        frontContext.clearRect(0, 0, front.width, front.height);
+        frontContext.drawImage(canvas, 0, 0);
+        if (!reduce.matches) requestFrame();
+      };
+      reduce.addEventListener('change', requestFrame);
+      resize();
+    })();
+  </script>
+
+</body>
+</html>
